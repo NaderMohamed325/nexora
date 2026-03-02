@@ -81,7 +81,5 @@ public class User implements UserDetails {
         return enabled;
     }
 
-    public enum Role {
-        USER, ADMIN
-    }
+
 }
