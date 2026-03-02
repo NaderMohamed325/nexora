@@ -8,14 +8,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name = "Users", description = "User management — CRUD operations")
 @SecurityRequirement(name = "Bearer Authentication")
 public class UserController {
@@ -61,7 +61,6 @@ public class UserController {
   @PutMapping
   public ResponseEntity<ApiResponse<UserResponseDto>> updateUser(
       @RequestHeader("Authorization") String authHeader, @RequestBody UserUpdateDto userUpdateDto) {
-
     String token = authHeader.substring(7);
     UserResponseDto updatedUser = userService.updateUser(token, userUpdateDto);
     return ResponseEntity.ok(ApiResponse.success("User updated successfully", updatedUser));
@@ -69,11 +68,43 @@ public class UserController {
 
   @Operation(
       summary = "Delete user by ID",
-      description = "Deletes a user by their unique identifier")
+      description = "Permanently deletes a user. Only accessible by admins")
   @DeleteMapping("/{id}")
-  @PreAuthorize("hasRole('ADMIN')") // Only admins can delete users
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
     userService.deleteUserById(id);
     return ResponseEntity.ok(ApiResponse.success("User deleted successfully"));
+  }
+
+  @Operation(
+      summary = "Deactivate account",
+      description = "Deactivates the user account. The account can be reactivated later")
+  @PutMapping("/{id}/deactivate")
+  @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+  public ResponseEntity<ApiResponse<Void>> deactivateAccount(@PathVariable Long id) {
+    userService.deactivateAccount(id);
+    return ResponseEntity.ok(ApiResponse.success("Account deactivated successfully"));
+  }
+
+  @Operation(
+      summary = "Schedule account for deletion",
+      description =
+          "Schedules the user account for permanent deletion after a grace period (30 days)")
+  @PutMapping("/{id}/schedule-deletion")
+  @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+  public ResponseEntity<ApiResponse<Void>> scheduleAccountForDeletion(@PathVariable Long id) {
+    userService.scheduleAccountForDeletion(id);
+    return ResponseEntity.ok(ApiResponse.success("Account scheduled for deletion"));
+  }
+
+  @Operation(
+      summary = "Reactivate account",
+      description =
+          "Reactivates a previously deactivated or deletion-scheduled account")
+  @PutMapping("/{id}/reactivate")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<ApiResponse<Void>> reactivateAccount(@PathVariable Long id) {
+    userService.reactivateAccount(id);
+    return ResponseEntity.ok(ApiResponse.success("Account reactivated successfully"));
   }
 }

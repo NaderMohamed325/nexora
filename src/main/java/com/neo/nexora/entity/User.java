@@ -57,6 +57,8 @@ public class User implements UserDetails {
     @Column(name = "scheduled_deletion_at")
     private LocalDateTime scheduledDeletionAt;
 
+    @Column(name = "last_login_at")
+    private  LocalDateTime lastLoginAt;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));

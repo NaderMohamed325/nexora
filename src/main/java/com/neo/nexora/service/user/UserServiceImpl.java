@@ -37,12 +37,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto getUserById(Long id) {
         User user = extractUserById(id);
         log.info("User found with id: {}", id);
-        return UserResponseDto.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
+        return UserResponseDto.fromEntity(user);
     }
 
     /**
@@ -64,12 +59,7 @@ public class UserServiceImpl implements UserService {
                                 });
 
         log.info("User found with email: {}", email);
-        return UserResponseDto.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
+        return UserResponseDto.fromEntity(user);
     }
 
     /**
@@ -80,14 +70,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(
-                        user ->
-                                UserResponseDto.builder()
-                                        .id(user.getId())
-                                        .username(user.getUsername())
-                                        .email(user.getEmail())
-                                        .role(user.getRole())
-                                        .build())
+                .map(UserResponseDto::fromEntity)
                 .toList();
     }
 
@@ -100,14 +83,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponseDto> getUsersLike(String likeUserName) {
         return userRepository.findByUsernameLike(likeUserName).stream()
-                .map(
-                        user ->
-                                UserResponseDto.builder()
-                                        .id(user.getId())
-                                        .username(user.getUsername())
-                                        .email(user.getEmail())
-                                        .role(user.getRole())
-                                        .build())
+                .map(UserResponseDto::fromEntity)
                 .toList();
     }
 
@@ -143,12 +119,7 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
         log.info("User updated successfully: {}", savedUser.getUsername());
 
-        return UserResponseDto.builder()
-                .id(savedUser.getId())
-                .username(savedUser.getUsername())
-                .email(savedUser.getEmail())
-                .role(savedUser.getRole())
-                .build();
+        return UserResponseDto.fromEntity(savedUser);
     }
 
     /**
