@@ -23,3 +23,6 @@ jwt:
 
 server:
   port: 8000
+
+
+debug: false
