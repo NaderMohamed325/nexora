@@ -8,8 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class NexoraApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(NexoraApplication.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(NexoraApplication.class, args);
+  }
 }
