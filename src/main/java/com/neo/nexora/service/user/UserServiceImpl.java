@@ -15,16 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Service
 @AllArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
 
+    private static final int GRACE_PERIOD_DAYS = 30;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
-    private static final int GRACE_PERIOD_DAYS = 30;
-
 
     /**
      * Retrieves a user by their unique identifier.
@@ -69,9 +67,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<UserResponseDto> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(UserResponseDto::fromEntity)
-                .toList();
+        return userRepository.findAll().stream().map(UserResponseDto::fromEntity).toList();
     }
 
     /**
@@ -170,7 +166,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User extractUserById(Long id)  {
+    public User extractUserById(Long id) {
         return userRepository
                 .findUserById(id)
                 .orElseThrow(

@@ -3,8 +3,8 @@ package com.neo.nexora.service.auth;
 import com.neo.nexora.dto.*;
 
 /**
- * Service interface for authentication-related operations including
- * registration, login, logout, password management, and admin creation.
+ * Service interface for authentication-related operations including registration, login, logout,
+ * password management, and admin creation.
  */
 public interface AuthService {
 
@@ -22,7 +22,8 @@ public interface AuthService {
      *
      * @param request the login request containing username and password
      * @return the authentication response with token and user details
-     * @throws org.springframework.security.authentication.BadCredentialsException if credentials are invalid
+     * @throws org.springframework.security.authentication.BadCredentialsException if credentials are
+     *                                                                             invalid
      */
     AuthResponse login(LoginRequest request);
 
@@ -47,17 +48,17 @@ public interface AuthService {
      *
      * @param request the password reset confirmation containing token, new password, and confirmation
      * @throws IllegalArgumentException if the passwords do not match
-     * @throws RuntimeException if the token is invalid, expired, or already used
+     * @throws RuntimeException         if the token is invalid, expired, or already used
      */
     void confirmPasswordReset(PasswordResetConfirm request);
 
     /**
      * Changes the password of the given authenticated user.
      *
-     * @param username       the username of the authenticated user
-     * @param request        the change password request containing current and new passwords
+     * @param username the username of the authenticated user
+     * @param request  the change password request containing current and new passwords
      * @throws IllegalArgumentException if the new password and confirmation do not match
-     * @throws RuntimeException if the current password is incorrect
+     * @throws RuntimeException         if the current password is incorrect
      */
     void changePassword(String username, ChangePasswordRequest request);
 
@@ -70,4 +71,3 @@ public interface AuthService {
      */
     UserResponseDto createAdmin(RegisterRequest request);
 }
-

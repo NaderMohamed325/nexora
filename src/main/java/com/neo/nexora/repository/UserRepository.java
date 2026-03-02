@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findUserById(Long id);
 
-
-    @Query("SELECT u FROM User u WHERE u.status = 'PENDING_DELETION' AND u.scheduledDeletionAt <= :now")
+    @Query(
+            "SELECT u FROM User u WHERE u.status = 'PENDING_DELETION' AND u.scheduledDeletionAt <= :now")
     List<User> findUsersScheduledForDeletion(@Param("now") LocalDateTime now);
 }

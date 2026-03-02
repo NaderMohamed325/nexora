@@ -57,8 +57,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse login(LoginRequest request) {
         Authentication authentication =
                 authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                request.getUsername(), request.getPassword()));
+                        new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         User user = (User) authentication.getPrincipal();
         String token = jwtUtil.generateToken(user);
@@ -92,10 +91,13 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("Passwords do not match");
         }
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user =
+                userRepository
+                        .findByUsername(username)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
 
-        passwordResetService.changePassword(user, request.getCurrentPassword(), request.getNewPassword());
+        passwordResetService.changePassword(
+                user, request.getCurrentPassword(), request.getNewPassword());
         log.info("Password changed successfully for user: {}", username);
     }
 
@@ -132,4 +134,3 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 }
-

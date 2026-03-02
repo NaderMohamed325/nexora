@@ -67,9 +67,9 @@ public interface UserService {
     void deleteUserById(Long id);
 
     /**
-     * Deactivates the account of the user with the specified unique identifier.
-     * This typically prevents the user from logging in or performing authenticated actions
-     * without permanently removing the user from the system.
+     * Deactivates the account of the user with the specified unique identifier. This typically
+     * prevents the user from logging in or performing authenticated actions without permanently
+     * removing the user from the system.
      *
      * @param id the unique identifier of the user whose account should be deactivated
      * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
@@ -78,8 +78,8 @@ public interface UserService {
     void deactivateAccount(Long id);
 
     /**
-     * Schedules the account of the user with the specified unique identifier for deletion.
-     * The actual deletion may be performed at a later time according to business or system policies.
+     * Schedules the account of the user with the specified unique identifier for deletion. The actual
+     * deletion may be performed at a later time according to business or system policies.
      *
      * @param id the unique identifier of the user whose account should be scheduled for deletion
      * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
@@ -88,9 +88,9 @@ public interface UserService {
     void scheduleAccountForDeletion(Long id);
 
     /**
-     * Reactivates the account of the user with the specified unique identifier.
-     * This reverses a previous deactivation or scheduled deletion, allowing the user
-     * to access their account again according to system rules.
+     * Reactivates the account of the user with the specified unique identifier. This reverses a
+     * previous deactivation or scheduled deletion, allowing the user to access their account again
+     * according to system rules.
      *
      * @param id the unique identifier of the user whose account should be reactivated
      * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
@@ -99,9 +99,8 @@ public interface UserService {
     void reactivateAccount(Long id);
 
     /**
-     * Retrieves the {@link User} entity by its unique identifier.
-     * Unlike {@link #getUserById(Long)}, this method returns the underlying entity
-     * instead of a DTO representation.
+     * Retrieves the {@link User} entity by its unique identifier. Unlike {@link #getUserById(Long)},
+     * this method returns the underlying entity instead of a DTO representation.
      *
      * @param id the unique identifier of the user
      * @return the {@link User} entity associated with the given identifier

@@ -51,6 +51,7 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private UserAccountStatus status = UserAccountStatus.ACTIVE;
+
     @Column(name = "deactivated_at")
     private LocalDateTime deactivatedAt;
 
@@ -58,7 +59,8 @@ public class User implements UserDetails {
     private LocalDateTime scheduledDeletionAt;
 
     @Column(name = "last_login_at")
-    private  LocalDateTime lastLoginAt;
+    private LocalDateTime lastLoginAt;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));

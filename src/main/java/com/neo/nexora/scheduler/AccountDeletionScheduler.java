@@ -1,6 +1,5 @@
 package com.neo.nexora.scheduler;
 
-
 import com.neo.nexora.entity.User;
 import com.neo.nexora.repository.UserRepository;
 import com.neo.nexora.service.user.UserService;
@@ -19,8 +18,6 @@ import java.util.List;
 public class AccountDeletionScheduler {
     private final UserRepository userRepository;
     private final UserService userService;
-
-
 
     @Async("schedulerTaskExecutor")
     @Scheduled(cron = "0 0 0 * * *")
@@ -49,10 +46,9 @@ public class AccountDeletionScheduler {
         log.info("Deletion job complete. Deleted {} accounts.", successfulDeletions);
     }
 
-
     @Scheduled(cron = "0 0 9 * * *") // every day at 9am
     public void sendDeletionReminders() {
         LocalDateTime sevenDaysFromNow = LocalDateTime.now().plusDays(7);
-        //TODO applying mailing service
+        // TODO applying mailing service
     }
 }
