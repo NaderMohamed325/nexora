@@ -1,6 +1,6 @@
 package com.neo.nexora.security;
 
-import com.neo.nexora.service.TokenBlacklistService;
+import com.neo.nexora.service.auth.TokenBlacklistService;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

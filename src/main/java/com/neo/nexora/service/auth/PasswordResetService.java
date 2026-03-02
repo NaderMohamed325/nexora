@@ -1,4 +1,4 @@
-package com.neo.nexora.service;
+package com.neo.nexora.service.auth;
 
 import com.neo.nexora.entity.PasswordResetToken;
 import com.neo.nexora.entity.User;

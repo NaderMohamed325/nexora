@@ -1,4 +1,4 @@
-package com.neo.nexora.service;
+package com.neo.nexora.service.auth;
 
 import com.neo.nexora.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
