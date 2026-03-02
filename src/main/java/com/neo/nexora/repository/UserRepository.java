@@ -12,18 +12,19 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-  Optional<User> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
-  Optional<User> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-  boolean existsByUsername(String username);
+    boolean existsByUsername(String username);
 
-  boolean existsByEmail(String email);
+    boolean existsByEmail(String email);
 
-  @Query(value = "SELECT * FROM users where username ILIKE %:username%", nativeQuery = true)
-  List<User> findByUsernameLike(@Param("username") String username);
+    @Query(value = "SELECT u FROM users where u.username ILIKE %:username%", nativeQuery = true)
+    List<User> findByUsernameLike(@Param("username") String username);
 
-  Optional<User> findUserById(Long id);
+    Optional<User> findUserById(Long id);
+
 
     @Query("SELECT u FROM User u WHERE u.status = 'PENDING_DELETION' AND u.scheduledDeletionAt <= :now")
     List<User> findUsersScheduledForDeletion(@Param("now") LocalDateTime now);
