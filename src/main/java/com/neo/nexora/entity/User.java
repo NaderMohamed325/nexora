@@ -2,9 +2,7 @@ package com.neo.nexora.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,14 +11,17 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = false,onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "users")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails {
+@Setter
+@Getter
+public class User extends AuditData implements UserDetails {
 
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -60,6 +61,8 @@ public class User implements UserDetails {
 
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

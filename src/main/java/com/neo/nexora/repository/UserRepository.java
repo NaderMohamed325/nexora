@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
-    @Query("SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%'))")
+    @Query(value = "SELECT * FROM users where username ILIKE %:username%", nativeQuery = true)
     List<User> findByUsernameLike(@Param("username") String username);
 
     Optional<User> findUserById(Long id);
