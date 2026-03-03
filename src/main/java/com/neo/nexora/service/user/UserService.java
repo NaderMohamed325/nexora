@@ -85,17 +85,7 @@ public interface UserService {
      * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
      *                                                            id
      */
-    void scheduleAccountForDeletion(Long id);
 
-    /**
-     * Reactivates the account of the user with the specified unique identifier. This reverses a
-     * previous deactivation or scheduled deletion, allowing the user to access their account again
-     * according to system rules.
-     *
-     * @param id the unique identifier of the user whose account should be reactivated
-     * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
-     *                                                            id
-     */
     void reactivateAccount(Long id);
 
     /**

@@ -87,22 +87,11 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("Account deactivated successfully"));
     }
 
-    @Operation(
-            summary = "Schedule account for deletion",
-            description =
-                    "Schedules the user account for permanent deletion after a grace period (30 days)")
-    @PutMapping("/{id}/schedule-deletion")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
-    public ResponseEntity<ApiResponse<Void>> scheduleAccountForDeletion(@PathVariable Long id) {
-        userService.scheduleAccountForDeletion(id);
-        return ResponseEntity.ok(ApiResponse.success("Account scheduled for deletion"));
-    }
 
     @Operation(
             summary = "Reactivate account",
             description = "Reactivates a previously deactivated or deletion-scheduled account")
     @PutMapping("/{id}/reactivate")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> reactivateAccount(@PathVariable Long id) {
         userService.reactivateAccount(id);
         return ResponseEntity.ok(ApiResponse.success("Account reactivated successfully"));

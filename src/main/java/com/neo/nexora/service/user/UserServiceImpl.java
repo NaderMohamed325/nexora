@@ -140,29 +140,21 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deactivateAccount(Long id) {
         User user = extractUserById(id);
-        user.setEnabled(false);
         user.setDeactivatedAt(LocalDateTime.now());
-        user.setStatus(UserAccountStatus.DEACTIVATED);
-        userRepository.save(user);
-    }
-
-    @Override
-    @Transactional
-    public void scheduleAccountForDeletion(Long id) {
-        User user = extractUserById(id);
         user.setScheduledDeletionAt(LocalDateTime.now().plusDays(GRACE_PERIOD_DAYS));
         user.setStatus(UserAccountStatus.PENDING_DELETION);
         userRepository.save(user);
     }
 
+
     @Override
     @Transactional
     public void reactivateAccount(Long id) {
         User user = extractUserById(id);
-        user.setEnabled(true);
         user.setStatus(UserAccountStatus.ACTIVE);
         user.setDeactivatedAt(null);
         user.setScheduledDeletionAt(null);
+        userRepository.save(user);
     }
 
     @Override
