@@ -5,6 +5,7 @@ import com.neo.nexora.repository.UserRepository;
 import com.neo.nexora.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ public class AccountDeletionScheduler {
     private final UserService userService;
 
     @Async("schedulerTaskExecutor")
+    @SchedulerLock(name = "myTask", lockAtLeastFor = "5m")
     @Scheduled(cron = "0 0 0 * * *")
     public void purgeExpiredAccounts() {
         log.info("Running account deletion job...");
