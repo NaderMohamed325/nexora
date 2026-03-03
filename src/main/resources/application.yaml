@@ -11,12 +11,30 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-
+  # ─────────────────────────────────────────────────────────────────────
+  # RabbitMQ connection settings for the User Deletion Queue pipeline.
+  #
+  # Architecture:
+  #   Producer (@Scheduled 2AM) → Exchange → Queue → Consumer (3-5 threads)
+  #
+  # The producer publishes UserDeletionBatchDto messages (up to 2000 user IDs
+  # each) to "user.deletion.exchange". The exchange routes them via
+  # "user.deletion.key" to the durable "user.deletion.queue" (TTL = 24h).
+  # The consumer picks them up and deletes users in sub-batches of 500.
+  #
+  # See: RabbitMQConfig.java, UserDeletionProducerImpl.java,
+  #      UserDeletionConsumerImpl.java, UserDeletionBatchDto.java
+  # ─────────────────────────────────────────────────────────────────────
+  rabbitmq:
+    host: localhost       # RabbitMQ broker hostname (use container name in Docker Compose)
+    port: 5672            # AMQP protocol port (15672 is the management UI, not used here)
+    username: guest        # Default RabbitMQ credentials — change in production!
+    password: guest        # Default RabbitMQ credentials — change in production!
 
 jwt:
   secret: GRoDbBQaVgDRIAVoCdoKwUQVkF6BVYp4t5e9Yz9KXkP
