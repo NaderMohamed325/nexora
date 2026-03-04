@@ -62,7 +62,8 @@ public class User extends AuditData implements UserDetails {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
-
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

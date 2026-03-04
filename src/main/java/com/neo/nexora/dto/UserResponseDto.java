@@ -35,6 +35,8 @@ public class UserResponseDto {
 
     private LocalDateTime scheduledDeletionAt;
 
+    private String avatarUrl;
+
     /**
      * Converts a {@link User} entity to a {@link UserResponseDto}.
      *
@@ -52,6 +54,7 @@ public class UserResponseDto {
                 .lastLoginAt(user.getLastLoginAt())
                 .deactivatedAt(user.getDeactivatedAt())
                 .scheduledDeletionAt(user.getScheduledDeletionAt())
+                .avatarUrl(user.getAvatarUrl())
                 .build();
     }
 }
