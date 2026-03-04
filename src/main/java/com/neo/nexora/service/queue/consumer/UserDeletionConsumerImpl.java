@@ -49,9 +49,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserDeletionConsumerImpl implements UserDeletionConsumer{
+public class UserDeletionConsumerImpl implements UserDeletionConsumer {
 
-    /** Repository used to execute bulk {@code DELETE} operations on the {@code users} table. */
+    /**
+     * Repository used to execute bulk {@code DELETE} operations on the {@code users} table.
+     */
     private final UserRepository userRepository;
 
 

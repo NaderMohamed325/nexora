@@ -105,7 +105,9 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
         return response;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(String publicId) {
         try {
