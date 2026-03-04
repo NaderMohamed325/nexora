@@ -9,6 +9,9 @@ import com.neo.nexora.repository.UserRepository;
 import com.neo.nexora.security.JwtUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private static final int GRACE_PERIOD_DAYS = 30;
     private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
+
 
     /**
      * Retrieves a user by their unique identifier.
@@ -66,8 +69,8 @@ public class UserServiceImpl implements UserService {
      * @return a list of {@link UserResponseDto} representing all users
      */
     @Override
-    public List<UserResponseDto> getAllUsers() {
-        return userRepository.findAll().stream().map(UserResponseDto::fromEntity).toList();
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     /**
@@ -86,16 +89,15 @@ public class UserServiceImpl implements UserService {
     /**
      * Updates the details of the authenticated user extracted from the JWT token.
      *
-     * @param token         the JWT token used to identify the authenticated user
+     * @param userDetails   User Data
      * @param userUpdateDto the DTO containing the updated user details
      * @return the updated user details as {@link UserResponseDto}
      * @throws ResourceNotFoundException if no user is found matching the token's subject
      */
     @Override
     @Transactional
-    public UserResponseDto updateUser(String token, UserUpdateDto userUpdateDto) {
-        String username = jwtUtil.extractUsername(token);
-
+    public UserResponseDto updateUser(UserDetails userDetails, UserUpdateDto userUpdateDto) {
+        String username = userDetails.getUsername();
         User user =
                 userRepository
                         .findByUsername(username)
@@ -138,8 +140,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deactivateAccount(Long id) {
-        User user = extractUserById(id);
+    public void deactivateAccount(UserDetails userDetails) {
+        String username = userDetails.getUsername();
+
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(
+                        () -> {
+                            log.warn("User not found with username: {}", username);
+                            return new ResourceNotFoundException("User not found with username: " + username);
+                        });
         user.setDeactivatedAt(LocalDateTime.now());
         user.setScheduledDeletionAt(LocalDateTime.now().plusDays(GRACE_PERIOD_DAYS));
         user.setStatus(UserAccountStatus.PENDING_DELETION);
@@ -149,8 +159,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void reactivateAccount(Long id) {
-        User user = extractUserById(id);
+    public void reactivateAccount(UserDetails userDetails) {
+        User user = userRepository
+                .findByUsername(userDetails.getUsername())
+                .orElseThrow(
+                        () -> {
+                            log.warn("User not found with username: {}", userDetails.getUsername());
+                            return new ResourceNotFoundException("User not found with username: " + userDetails.getUsername());
+                        });
         user.setStatus(UserAccountStatus.ACTIVE);
         user.setDeactivatedAt(null);
         user.setScheduledDeletionAt(null);

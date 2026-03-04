@@ -4,15 +4,21 @@ import com.neo.nexora.dto.ApiResponse;
 import com.neo.nexora.dto.CloudinaryUploadResponse;
 import com.neo.nexora.dto.UserResponseDto;
 import com.neo.nexora.dto.UserUpdateDto;
+import com.neo.nexora.entity.User;
 import com.neo.nexora.service.cloudinary.CloudinaryUploadService;
 import com.neo.nexora.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +44,7 @@ public class UserController {
     }
 
     @Operation(summary = "Get user by email", description = "Retrieves a user by their email address")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/email/{email}")
     public ResponseEntity<ApiResponse<UserResponseDto>> getUserByEmail(@PathVariable String email) {
         UserResponseDto user = userService.getUserByEmail(email);
@@ -46,9 +53,14 @@ public class UserController {
 
     @Operation(summary = "Get all users", description = "Retrieves all registered users")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUsers() {
-        List<UserResponseDto> users = userService.getAllUsers();
+    public ResponseEntity<ApiResponse<Page<User>>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+
+        Page<User> users = userService.getAllUsers(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDir), sortBy)));
         return ResponseEntity.ok(ApiResponse.success("Users retrieved successfully", users));
+
     }
 
     @Operation(
@@ -65,10 +77,10 @@ public class UserController {
             summary = "Update current user",
             description = "Updates the authenticated user's details using the JWT token")
     @PutMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<UserResponseDto>> updateUser(
-            @RequestHeader("Authorization") String authHeader, @RequestBody UserUpdateDto userUpdateDto) {
-        String token = authHeader.substring(7);
-        UserResponseDto updatedUser = userService.updateUser(token, userUpdateDto);
+            @AuthenticationPrincipal UserDetails userDetails, @RequestBody UserUpdateDto userUpdateDto) {
+        UserResponseDto updatedUser = userService.updateUser(userDetails, userUpdateDto);
         return ResponseEntity.ok(ApiResponse.success("User updated successfully", updatedUser));
     }
 
@@ -85,10 +97,10 @@ public class UserController {
     @Operation(
             summary = "Deactivate account",
             description = "Deactivates the user account. The account can be reactivated later")
-    @PutMapping("/{id}/deactivate")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
-    public ResponseEntity<ApiResponse<Void>> deactivateAccount(@PathVariable Long id) {
-        userService.deactivateAccount(id);
+    @PutMapping("/deactivate")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deactivateAccount(@AuthenticationPrincipal UserDetails userDetails) {
+        userService.deactivateAccount(userDetails);
         return ResponseEntity.ok(ApiResponse.success("Account deactivated successfully"));
     }
 
@@ -96,9 +108,10 @@ public class UserController {
     @Operation(
             summary = "Reactivate account",
             description = "Reactivates a previously deactivated or deletion-scheduled account")
-    @PutMapping("/{id}/reactivate")
-    public ResponseEntity<ApiResponse<Void>> reactivateAccount(@PathVariable Long id) {
-        userService.reactivateAccount(id);
+    @PutMapping("/reactivate")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> reactivateAccount(@AuthenticationPrincipal UserDetails userDetails) {
+        userService.reactivateAccount(userDetails);
         return ResponseEntity.ok(ApiResponse.success("Account reactivated successfully"));
     }
 

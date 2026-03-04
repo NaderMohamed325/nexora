@@ -3,6 +3,9 @@ package com.neo.nexora.service.user;
 import com.neo.nexora.dto.UserResponseDto;
 import com.neo.nexora.dto.UserUpdateDto;
 import com.neo.nexora.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
@@ -34,9 +37,9 @@ public interface UserService {
     /**
      * Retrieves all registered users.
      *
-     * @return a list of {@link UserResponseDto} representing all users
+     * @return a page of {@link User} representing all users
      */
-    List<UserResponseDto> getAllUsers();
+    public Page<User> getAllUsers(Pageable pageable);
 
     /**
      * Searches for users whose username matches the given pattern.
@@ -55,7 +58,7 @@ public interface UserService {
      * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found matching the
      *                                                            token's subject
      */
-    UserResponseDto updateUser(String token, UserUpdateDto userUpdateDto);
+    UserResponseDto updateUser(UserDetails userDetails, UserUpdateDto userUpdateDto);
 
     /**
      * Deletes a user by their unique identifier.
@@ -75,7 +78,7 @@ public interface UserService {
      * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
      *                                                            id
      */
-    void deactivateAccount(Long id);
+    void deactivateAccount(UserDetails userDetails);
 
     /**
      * Schedules the account of the user with the specified unique identifier for deletion. The actual
@@ -86,7 +89,7 @@ public interface UserService {
      *                                                            id
      */
 
-    void reactivateAccount(Long id);
+    void reactivateAccount(UserDetails userDetails);
 
     /**
      * Retrieves the {@link User} entity by its unique identifier. Unlike {@link #getUserById(Long)},
