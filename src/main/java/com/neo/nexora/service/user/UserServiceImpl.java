@@ -6,7 +6,7 @@ import com.neo.nexora.entity.User;
 import com.neo.nexora.entity.UserAccountStatus;
 import com.neo.nexora.exception.ResourceNotFoundException;
 import com.neo.nexora.repository.UserRepository;
-import com.neo.nexora.security.JwtUtil;
+import com.neo.nexora.service.user.lookUp.UserLookUpService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private static final int GRACE_PERIOD_DAYS = 30;
     private final UserRepository userRepository;
+    private final UserLookUpService userLookUpService;
 
 
     /**
@@ -109,6 +110,7 @@ public class UserServiceImpl implements UserService {
 
         if (userUpdateDto.getUsername() != null && !userUpdateDto.getUsername().isBlank()) {
             user.setUsername(userUpdateDto.getUsername());
+            userLookUpService.addUser(userUpdateDto.getUsername());
         }
         if (userUpdateDto.getEmail() != null && !userUpdateDto.getEmail().isBlank()) {
             user.setEmail(userUpdateDto.getEmail());
