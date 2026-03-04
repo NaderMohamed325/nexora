@@ -65,6 +65,9 @@ public class User extends AuditData implements UserDetails {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
