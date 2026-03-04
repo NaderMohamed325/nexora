@@ -12,4 +12,3 @@ public class PasswordResetConfirm {
     private String newPassword;
     private String confirmPassword;
 }
-

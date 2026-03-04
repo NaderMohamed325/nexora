@@ -9,5 +9,4 @@ class NexoraApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

@@ -9,6 +9,6 @@ import java.time.LocalDateTime;
 @Repository
 public interface BlacklistedTokenRepository extends JpaRepository<BlacklistedToken, Long> {
     boolean existsByToken(String token);
+
     void deleteByExpiryDateBefore(LocalDateTime dateTime);
 }
-

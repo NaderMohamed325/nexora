@@ -27,4 +27,3 @@ public class BlacklistedToken {
     @Column(nullable = false)
     private LocalDateTime blacklistedAt;
 }
-

@@ -1,4 +1,4 @@
-package com.neo.nexora.service;
+package com.neo.nexora.service.auth;
 
 import com.neo.nexora.entity.BlacklistedToken;
 import com.neo.nexora.repository.BlacklistedTokenRepository;
@@ -28,11 +28,11 @@ public class TokenBlacklistService {
         blacklistedToken.setToken(token);
         blacklistedToken.setBlacklistedAt(LocalDateTime.now());
         blacklistedToken.setExpiryDate(
-                jwtUtil.extractExpiration(token)
+                jwtUtil
+                        .extractExpiration(token)
                         .toInstant()
                         .atZone(ZoneId.systemDefault())
-                        .toLocalDateTime()
-        );
+                        .toLocalDateTime());
 
         blacklistedTokenRepository.save(blacklistedToken);
     }
@@ -42,8 +42,8 @@ public class TokenBlacklistService {
     }
 
     /**
-     * Scheduled cleanup: removes expired blacklisted tokens every hour.
-     * Once a JWT has expired, there's no need to keep it in the blacklist.
+     * Scheduled cleanup: removes expired blacklisted tokens every hour. Once a JWT has expired,
+     * there's no need to keep it in the blacklist.
      */
     @Transactional
     @Scheduled(fixedRate = 3600000) // every hour
@@ -51,5 +51,3 @@ public class TokenBlacklistService {
         blacklistedTokenRepository.deleteByExpiryDateBefore(LocalDateTime.now());
     }
 }
-
-

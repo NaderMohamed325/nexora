@@ -1,4 +1,4 @@
-package com.neo.nexora.service;
+package com.neo.nexora.service.auth;
 
 import com.neo.nexora.entity.PasswordResetToken;
 import com.neo.nexora.entity.User;
@@ -16,16 +16,17 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PasswordResetService {
 
+    private static final int RESET_TOKEN_EXPIRY_MINUTES = 30;
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository resetTokenRepository;
     private final PasswordEncoder passwordEncoder;
 
-    private static final int RESET_TOKEN_EXPIRY_MINUTES = 30;
-
     @Transactional
     public String createResetToken(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("No account found with that email"));
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("No account found with that email"));
 
         // Invalidate any existing tokens for this user
         resetTokenRepository.deleteByUserId(user.getId());
@@ -47,8 +48,10 @@ public class PasswordResetService {
 
     @Transactional
     public void resetPassword(String token, String newPassword) {
-        PasswordResetToken resetToken = resetTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid reset token"));
+        PasswordResetToken resetToken =
+                resetTokenRepository
+                        .findByToken(token)
+                        .orElseThrow(() -> new RuntimeException("Invalid reset token"));
 
         if (resetToken.isUsed()) {
             throw new RuntimeException("Reset token has already been used");
@@ -76,4 +79,3 @@ public class PasswordResetService {
         userRepository.save(user);
     }
 }
-

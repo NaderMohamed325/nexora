@@ -1,0 +1,104 @@
+package com.neo.nexora.service.user;
+
+import com.neo.nexora.dto.UserResponseDto;
+import com.neo.nexora.dto.UserUpdateDto;
+import com.neo.nexora.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.List;
+
+/**
+ * Service interface for managing user-related operations.
+ */
+public interface UserService {
+
+    /**
+     * Retrieves a user by their unique identifier.
+     *
+     * @param id the unique identifier of the user
+     * @return the user details as {@link UserResponseDto}
+     * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
+     *                                                            id
+     */
+    UserResponseDto getUserById(Long id);
+
+    /**
+     * Retrieves a user by their email address.
+     *
+     * @param email the email address of the user
+     * @return the user details as {@link UserResponseDto}
+     * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
+     *                                                            email
+     */
+    UserResponseDto getUserByEmail(String email);
+
+    /**
+     * Retrieves all registered users.
+     *
+     * @return a page of {@link User} representing all users
+     */
+    public Page<User> getAllUsers(Pageable pageable);
+
+    /**
+     * Searches for users whose username matches the given pattern.
+     *
+     * @param likeUserName the partial or full username to search for
+     * @return a list of {@link UserResponseDto} matching the search criteria
+     */
+    List<UserResponseDto> getUsersLike(String likeUserName);
+
+    /**
+     * Updates the details of the authenticated user extracted from the JWT token.
+     *
+     * @param token         the JWT token used to identify the authenticated user
+     * @param userUpdateDto the DTO containing the updated user details
+     * @return the updated user details as {@link UserResponseDto}
+     * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found matching the
+     *                                                            token's subject
+     */
+    UserResponseDto updateUser(UserDetails userDetails, UserUpdateDto userUpdateDto);
+
+    /**
+     * Deletes a user by their unique identifier.
+     *
+     * @param id the unique identifier of the user to delete
+     * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
+     *                                                            id
+     */
+    void deleteUserById(Long id);
+
+    /**
+     * Deactivates the account of the user with the specified unique identifier. This typically
+     * prevents the user from logging in or performing authenticated actions without permanently
+     * removing the user from the system.
+     *
+     * @param id the unique identifier of the user whose account should be deactivated
+     * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
+     *                                                            id
+     */
+    void deactivateAccount(UserDetails userDetails);
+
+    /**
+     * Schedules the account of the user with the specified unique identifier for deletion. The actual
+     * deletion may be performed at a later time according to business or system policies.
+     *
+     * @param id the unique identifier of the user whose account should be scheduled for deletion
+     * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
+     *                                                            id
+     */
+
+    void reactivateAccount(UserDetails userDetails);
+
+    /**
+     * Retrieves the {@link User} entity by its unique identifier. Unlike {@link #getUserById(Long)},
+     * this method returns the underlying entity instead of a DTO representation.
+     *
+     * @param id the unique identifier of the user
+     * @return the {@link User} entity associated with the given identifier
+     * @throws com.neo.nexora.exception.ResourceNotFoundException if no user is found with the given
+     *                                                            id
+     */
+    User extractUserById(Long id);
+}

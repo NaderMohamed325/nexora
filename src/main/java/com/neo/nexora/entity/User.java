@@ -1,24 +1,27 @@
 package com.neo.nexora.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "users")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails {
+@Setter
+@Getter
+public class User extends AuditData implements UserDetails {
 
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -28,6 +31,7 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -45,6 +49,21 @@ public class User implements UserDetails {
 
     @Column(name = "enabled")
     private boolean enabled = true;
+
+    @Enumerated(EnumType.STRING)
+    private UserAccountStatus status = UserAccountStatus.ACTIVE;
+
+    @Column(name = "deactivated_at")
+    private LocalDateTime deactivatedAt;
+
+    @Column(name = "scheduled_deletion_at")
+    private LocalDateTime scheduledDeletionAt;
+
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -79,9 +98,5 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public enum Role {
-        USER, ADMIN
     }
 }
