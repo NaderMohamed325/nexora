@@ -14,28 +14,44 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CloudinaryUploadResponse {
 
-    /** Cloudinary public ID — use this to transform or delete the asset later. */
+    /**
+     * Cloudinary public ID — use this to transform or delete the asset later.
+     */
     private String publicId;
 
-    /** Secure HTTPS URL of the uploaded asset. */
+    /**
+     * Secure HTTPS URL of the uploaded asset.
+     */
     private String secureUrl;
 
-    /** Original filename as reported by Cloudinary. */
+    /**
+     * Original filename as reported by Cloudinary.
+     */
     private String originalFilename;
 
-    /** File format (e.g. {@code jpg}, {@code png}, {@code webp}). */
+    /**
+     * File format (e.g. {@code jpg}, {@code png}, {@code webp}).
+     */
     private String format;
 
-    /** Width in pixels (images only). */
+    /**
+     * Width in pixels (images only).
+     */
     private Integer width;
 
-    /** Height in pixels (images only). */
+    /**
+     * Height in pixels (images only).
+     */
     private Integer height;
 
-    /** File size in bytes. */
+    /**
+     * File size in bytes.
+     */
     private Long bytes;
 
-    /** Resource type: {@code image}, {@code video}, or {@code raw}. */
+    /**
+     * Resource type: {@code image}, {@code video}, or {@code raw}.
+     */
     private String resourceType;
 }
 

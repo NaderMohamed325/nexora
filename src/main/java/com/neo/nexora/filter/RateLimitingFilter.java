@@ -26,6 +26,8 @@ public class RateLimitingFilter implements Filter {
             filterChain.doFilter(servletRequest, servletResponse); // Forward the request if rate limiting is not hit
         } else {
             ((HttpServletResponse) servletResponse).setStatus(429); // Return 429 if rate limit is exceeded
+            servletResponse.setContentType("application/json");
+            servletResponse.getWriter().write("{\"error\": \"Too Many Requests\", \"message\": \"You have exceeded the rate limit. Please try again later.\"}");
         }
     }
 

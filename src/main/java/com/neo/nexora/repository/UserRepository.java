@@ -35,16 +35,24 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    /** Finds a user by exact username match (used during login/authentication). */
+    /**
+     * Finds a user by exact username match (used during login/authentication).
+     */
     Optional<User> findByUsername(String username);
 
-    /** Finds a user by exact email match (used during registration and password reset). */
+    /**
+     * Finds a user by exact email match (used during registration and password reset).
+     */
     Optional<User> findByEmail(String email);
 
-    /** Checks if a username is already taken (used during registration validation). */
+    /**
+     * Checks if a username is already taken (used during registration validation).
+     */
     boolean existsByUsername(String username);
 
-    /** Checks if an email is already registered (used during registration validation). */
+    /**
+     * Checks if an email is already registered (used during registration validation).
+     */
     boolean existsByEmail(String email);
 
     /**
@@ -57,7 +65,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT * FROM users where username ILIKE %:username%", nativeQuery = true)
     List<User> findByUsernameLike(@Param("username") String username);
 
-    /** Finds a single user by primary key (returns {@link Optional#empty()} if not found). */
+    /**
+     * Finds a single user by primary key (returns {@link Optional#empty()} if not found).
+     */
     Optional<User> findUserById(Long id);
 
     /**

@@ -1,7 +1,7 @@
 package com.neo.nexora.config;
 
-import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,10 +17,7 @@ public class RateLimitConfig {
     @Bean
     public Bucket bucket() {
         // Define the bandwidth with a limit of 100 tokens, refilled every minute
-        Bandwidth limit = Bandwidth.builder()
-                .capacity(100)
-                .refillGreedy(100, Duration.ofMinutes(1))
-                .build();
+        Bandwidth limit = Bandwidth.simple(100, Duration.ofMinutes(1));
 
         return Bucket.builder()
                 .addLimit(limit)

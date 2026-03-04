@@ -57,13 +57,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    /** Queue name where user deletion batch messages are stored until consumed. */
+    /**
+     * Queue name where user deletion batch messages are stored until consumed.
+     */
     public static final String QUEUE_NAME = "user.deletion.queue";
 
-    /** Direct exchange name that routes messages to the deletion queue by routing key. */
+    /**
+     * Direct exchange name that routes messages to the deletion queue by routing key.
+     */
     public static final String EXCHANGE_NAME = "user.deletion.exchange";
 
-    /** Routing key that binds the exchange to the queue — must match on both producer and binding. */
+    /**
+     * Routing key that binds the exchange to the queue — must match on both producer and binding.
+     */
     public static final String ROUTING_KEY = "user.deletion.key";
 
     /**
@@ -175,8 +181,8 @@ public class RabbitMQConfig {
      *       to JSON before sending</li>
      * </ul>
      *
-     * @param connectionFactory  Spring-managed RabbitMQ connection factory (auto-configured)
-     * @param messageConverter   the JSON message converter bean
+     * @param connectionFactory Spring-managed RabbitMQ connection factory (auto-configured)
+     * @param messageConverter  the JSON message converter bean
      * @return a configured {@link RabbitTemplate}
      */
     @Bean
@@ -197,8 +203,8 @@ public class RabbitMQConfig {
      * </ul>
      * This means up to 5 batches (5 × 2000 = 10,000 users) can be processed concurrently.
      *
-     * @param connectionFactory  Spring-managed RabbitMQ connection factory
-     * @param messageConverter   the JSON message converter for deserializing incoming messages
+     * @param connectionFactory Spring-managed RabbitMQ connection factory
+     * @param messageConverter  the JSON message converter for deserializing incoming messages
      * @return a configured {@link SimpleRabbitListenerContainerFactory}
      */
     @Bean

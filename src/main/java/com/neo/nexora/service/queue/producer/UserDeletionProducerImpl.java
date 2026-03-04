@@ -6,6 +6,7 @@ import com.neo.nexora.entity.User;
 import com.neo.nexora.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -61,10 +62,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserDeletionProducerImpl implements UserDeletionProducer {
 
-    /** Template used to convert and send {@link UserDeletionBatchDto} messages to RabbitMQ. */
+    /**
+     * Template used to convert and send {@link UserDeletionBatchDto} messages to RabbitMQ.
+     */
     private final RabbitTemplate rabbitTemplate;
 
-    /** Repository used to query users whose {@code scheduledForDeletionAt} has passed. */
+    /**
+     * Repository used to query users whose {@code scheduledForDeletionAt} has passed.
+     */
     private final UserRepository userRepository;
 
     /**
@@ -86,6 +91,7 @@ public class UserDeletionProducerImpl implements UserDeletionProducer {
      * there are no more pages.</p>
      */
     @Override
+    @SchedulerLock
     @Scheduled(cron = "0 0 2 * * *")
     public void scheduleUserDeletion() {
         log.info("========== User deletion job started ==========");
