@@ -116,10 +116,20 @@ public class UserServiceImpl implements UserService {
             user.setEmail(userUpdateDto.getEmail());
         }
 
-        User savedUser = userRepository.save(user);
-        log.info("User updated successfully: {}", savedUser.getUsername());
 
-        return UserResponseDto.fromEntity(savedUser);
+        log.info("User updated successfully: {}", userUpdateDto.getUsername());
+
+        return UserResponseDto.builder().id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .status(user.getStatus())
+                .enabled(user.isEnabled())
+                .lastLoginAt(user.getLastLoginAt())
+                .deactivatedAt(user.getDeactivatedAt())
+                .scheduledDeletionAt(user.getScheduledDeletionAt())
+                .avatarUrl(user.getAvatarUrl())
+                .build();
     }
 
     /**
