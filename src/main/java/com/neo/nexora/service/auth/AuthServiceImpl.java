@@ -109,6 +109,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public UserResponseDto createAdmin(RegisterRequest request) {
+        // Use Bloom filter first for fast rejection
         if (userLookUpService.mightContainUser(request.getUsername())
                 && userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
