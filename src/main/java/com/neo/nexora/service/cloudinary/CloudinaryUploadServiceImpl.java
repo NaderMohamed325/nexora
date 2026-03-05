@@ -23,7 +23,8 @@ import java.util.UUID;
  * Default implementation of {@link CloudinaryUploadService}.
  *
  * <p>Uses the Cloudinary Java SDK to upload, manage, and delete assets. Avatar uploads are stored
- * under the {@code avatars/} folder. Each upload is given a unique public ID to prevent collisions.
+ * under the {@code avatars/} folder and are restricted to image files only. General uploads
+ * support both images and videos. Each upload is given a unique public ID to prevent collisions.
  */
 @Service
 @RequiredArgsConstructor
@@ -36,8 +37,13 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
     @Value("${cloudinary.max-file-size:5242880}")
     private long maxFileSize;
 
-    @Value("${cloudinary.allowed-types:image/jpeg,image/png,image/webp,image/gif}")
-    private String allowedTypes;
+    /** Allowed MIME types for avatar uploads — images only. */
+    @Value("${cloudinary.allowed-image-types:image/jpeg,image/png,image/webp,image/gif}")
+    private String allowedImageTypes;
+
+    /** Allowed MIME types for general uploads — images and videos. */
+    @Value("${cloudinary.allowed-media-types:image/jpeg,image/png,image/webp,image/gif,video/mp4,video/mpeg,video/quicktime,video/webm}")
+    private String allowedMediaTypes;
 
     // ──────────────────────────────────────────────────────────────────────────
     // Public API
@@ -46,12 +52,12 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
     /**
      * {@inheritDoc}
      *
-     * <p>Validates file size and MIME type before uploading. A unique public ID is generated to
-     * prevent filename collisions.
+     * <p>Validates file size and MIME type (images + videos) before uploading.
+     * A unique public ID is generated to prevent filename collisions.
      */
     @Override
     public CloudinaryUploadResponse upload(MultipartFile file, String folder) {
-        validateFile(file);
+        validateFile(file, allowedMediaTypes);
 
         String publicId = folder + "/" + UUID.randomUUID();
 
@@ -80,11 +86,13 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
     /**
      * {@inheritDoc}
      *
-     * <p>Uploads the file to the {@code avatars/} folder and persists the resulting secure URL to
-     * the user record.
+     * <p>Uploads the file to the {@code avatars/} folder — images only (no videos).
+     * Persists the resulting secure URL to the user record.
      */
     @Override
     public CloudinaryUploadResponse uploadAvatar(MultipartFile file, Long userId) {
+        validateFile(file, allowedImageTypes);
+
         User user =
                 userRepository
                         .findById(userId)
@@ -96,13 +104,33 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
             deleteByUrl(user.getAvatarUrl());
         }
 
-        CloudinaryUploadResponse response = upload(file, "avatars");
+        String publicId = "avatars/" + UUID.randomUUID();
 
-        user.setAvatarUrl(response.getSecureUrl());
-        userRepository.save(user);
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> result =
+                    cloudinary
+                            .uploader()
+                            .upload(
+                                    file.getBytes(),
+                                    ObjectUtils.asMap(
+                                            "public_id", publicId,
+                                            "folder", "avatars",
+                                            "resource_type", "image",
+                                            "overwrite", true));
 
-        log.info("Avatar updated for userId={}, url={}", userId, response.getSecureUrl());
-        return response;
+            CloudinaryUploadResponse response = mapToResponse(result);
+
+            user.setAvatarUrl(response.getSecureUrl());
+            userRepository.save(user);
+
+            log.info("Avatar updated for userId={}, url={}", userId, response.getSecureUrl());
+            return response;
+
+        } catch (IOException e) {
+            log.error("Avatar upload failed for userId={}", userId, e);
+            throw new CloudinaryUploadException("Failed to upload avatar to Cloudinary", e);
+        }
     }
 
     /**
@@ -123,7 +151,13 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
     // Private helpers
     // ──────────────────────────────────────────────────────────────────────────
 
-    private void validateFile(MultipartFile file) {
+    /**
+     * Validates file size and MIME type against the provided allowed types.
+     *
+     * @param file         the file to validate
+     * @param allowedTypes comma-separated list of allowed MIME types
+     */
+    private void validateFile(MultipartFile file, String allowedTypes) {
         if (file == null || file.isEmpty()) {
             throw new CloudinaryUploadException("Upload file must not be empty");
         }
@@ -160,15 +194,12 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
      * <p>Cloudinary secure URLs follow the pattern: {@code
      * https://res.cloudinary.com/<cloud>/image/upload/v<version>/<public_id>.<ext>}
      */
-    private void deleteByUrl(String secureUrl) {
+    public void deleteByUrl(String secureUrl) {
         try {
-            // Strip extension and extract public_id (everything after /upload/v<version>/)
             String[] parts = secureUrl.split("/upload/");
             if (parts.length == 2) {
-                String withVersion = parts[1]; // e.g. "v1234567/avatars/uuid.jpg"
-                // Remove version prefix if present
+                String withVersion = parts[1];
                 String publicIdWithExt = withVersion.replaceFirst("v\\d+/", "");
-                // Remove extension
                 String publicId = publicIdWithExt.contains(".")
                         ? publicIdWithExt.substring(0, publicIdWithExt.lastIndexOf('.'))
                         : publicIdWithExt;
@@ -178,6 +209,19 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
             log.warn("Could not parse or delete old avatar from Cloudinary, url={}", secureUrl, e);
         }
     }
+
+
+    @Override
+    public String extractPublicId(String cloudinaryUrl) {
+        String withoutExtension = cloudinaryUrl.substring(0, cloudinaryUrl.lastIndexOf('.'));
+
+        // Split by "/upload/"
+        String afterUpload = withoutExtension.split("/upload/")[1];
+
+        if (afterUpload.matches("v\\d+/.*")) {
+            afterUpload = afterUpload.substring(afterUpload.indexOf('/') + 1);
+        }
+
+        return afterUpload;
+    }
 }
-
-
