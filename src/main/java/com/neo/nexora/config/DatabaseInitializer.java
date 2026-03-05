@@ -22,6 +22,15 @@ public class DatabaseInitializer implements ApplicationRunner {
                 "CREATE INDEX IF NOT EXISTS idx_users_name_trgm " +
                         "ON users USING GIN (username gin_trgm_ops)"
         ).executeUpdate();
+        entityManager.createNativeQuery(
+                "CREATE INDEX IF NOT EXISTS idx_posts_title_trgm " +
+                        "ON posts USING GIN (title gin_trgm_ops)"
+        ).executeUpdate();
+
+        entityManager.createNativeQuery(
+                "CREATE INDEX IF NOT EXISTS idx_posts_content_trgm " +
+                        "ON posts USING GIN (content gin_trgm_ops)"
+        ).executeUpdate();
     }
 
 }
