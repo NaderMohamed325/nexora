@@ -10,6 +10,7 @@ import com.neo.nexora.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -79,7 +80,7 @@ public class UserController {
     @PutMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<UserResponseDto>> updateUser(
-            @AuthenticationPrincipal UserDetails userDetails, @RequestBody UserUpdateDto userUpdateDto) {
+            @AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody UserUpdateDto userUpdateDto) {
         UserResponseDto updatedUser = userService.updateUser(userDetails, userUpdateDto);
         return ResponseEntity.ok(ApiResponse.success("User updated successfully", updatedUser));
     }

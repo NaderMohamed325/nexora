@@ -5,6 +5,7 @@ import com.neo.nexora.service.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class AuthController {
             summary = "Register a new user",
             description = "Creates a new user account and returns a JWT token")
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<AuthResponse>> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
         try {
             AuthResponse authResponse = authService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -37,7 +38,7 @@ public class AuthController {
 
     @Operation(summary = "Login", description = "Authenticates a user and returns a JWT token")
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         try {
             AuthResponse authResponse = authService.login(request);
             return ResponseEntity.ok(ApiResponse.success("Login successful", authResponse));
@@ -69,7 +70,7 @@ public class AuthController {
             description = "Generates a password reset token for the given email")
     @PostMapping("/password-reset/request")
     public ResponseEntity<ApiResponse<String>> requestPasswordReset(
-            @RequestBody PasswordResetRequest request) {
+            @Valid @RequestBody PasswordResetRequest request) {
         try {
             String resetToken = authService.requestPasswordReset(request);
             return ResponseEntity.ok(
@@ -84,7 +85,7 @@ public class AuthController {
             description = "Resets the password using the provided reset token")
     @PostMapping("/password-reset/confirm")
     public ResponseEntity<ApiResponse<Void>> confirmPasswordReset(
-            @RequestBody PasswordResetConfirm request) {
+            @Valid @RequestBody PasswordResetConfirm request) {
         try {
             authService.confirmPasswordReset(request);
             return ResponseEntity.ok(ApiResponse.success("Password has been reset successfully"));
@@ -100,7 +101,7 @@ public class AuthController {
     @PostMapping("/change-password")
     public ResponseEntity<ApiResponse<Void>> changePassword(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody ChangePasswordRequest request) {
+            @Valid @RequestBody ChangePasswordRequest request) {
         try {
             authService.changePassword(userDetails.getUsername(), request);
             return ResponseEntity.ok(ApiResponse.success("Password changed successfully"));
@@ -116,7 +117,7 @@ public class AuthController {
     @PostMapping("/create-admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<UserResponseDto>> createAdmin(
-            @RequestBody RegisterRequest request) {
+            @Valid @RequestBody RegisterRequest request) {
         try {
             UserResponseDto responseDto = authService.createAdmin(request);
             return ResponseEntity.status(HttpStatus.CREATED)
