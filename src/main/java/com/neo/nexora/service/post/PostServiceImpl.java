@@ -40,6 +40,7 @@ public class PostServiceImpl implements PostService {
         dto.setTitle(post.getTitle());
         dto.setContent(post.getContent());
         dto.setCreatedAt(post.getCreatedAt());
+        dto.setUpdatedAt(post.getUpdatedAt());
         dto.setMedia_urls(post.getMedia_urls());
         return dto;
     }
@@ -66,9 +67,9 @@ public class PostServiceImpl implements PostService {
         }
         post.setMedia_urls(urls);
 
-        postRepository.save(post);
+        Post saved = postRepository.save(post);
 
-        return null;
+        return mapToResponseDto(saved);
     }
 
     @Override
@@ -83,6 +84,11 @@ public class PostServiceImpl implements PostService {
             responseDtos.add(mapToResponseDto(post));
         }
         return responseDtos;
+    }
+
+    @Override
+    public Page<PostResponseDto> getAllPosts(int page, int size) {
+        return postRepository.findAll(PageRequest.of(page, size)).map(this::mapToResponseDto);
     }
 
     @Override
