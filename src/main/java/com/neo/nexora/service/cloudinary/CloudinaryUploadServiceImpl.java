@@ -212,16 +212,31 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
 
 
     @Override
-    public String extractPublicId(String cloudinaryUrl) {
-        String withoutExtension = cloudinaryUrl.substring(0, cloudinaryUrl.lastIndexOf('.'));
+    public String extractPublicId(String url) {
+        if (url == null || url.isBlank()) {
+            log.error("Cannot extract public ID from a null or blank URL");
+            throw new CloudinaryUploadException("Cloudinary URL must not be null or blank");
+        }
 
-        // Split by "/upload/"
-        String afterUpload = withoutExtension.split("/upload/")[1];
+        String[] parts = url.split("/upload/");
+        if (parts.length < 2 || parts[1].isBlank()) {
+            log.error("URL does not contain expected '/upload/' segment: {}", url);
+            throw new CloudinaryUploadException("Invalid Cloudinary URL — missing '/upload/' segment: " + url);
+        }
 
-        if (afterUpload.matches("v\\d+/.*")) {
+        String afterUpload = parts[1];
+        // Strip optional version segment (v1234567890/)
+        if (afterUpload.startsWith("v") && afterUpload.contains("/")) {
             afterUpload = afterUpload.substring(afterUpload.indexOf('/') + 1);
         }
 
-        return afterUpload;
+        int dotIndex = afterUpload.lastIndexOf('.');
+        if (dotIndex <= 0) {
+            log.error("URL segment after '/upload/' has no recognisable extension: {}", afterUpload);
+            throw new CloudinaryUploadException("Invalid Cloudinary URL — no file extension found: " + url);
+        }
+
+        return afterUpload.substring(0, dotIndex);
     }
+
 }
