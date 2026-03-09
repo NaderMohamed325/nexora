@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Spring Data JPA repository for {@link User} entities.
@@ -109,6 +110,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("DELETE FROM User u WHERE u.id IN :ids")
     void deleteBatch(@Param("ids") List<Long> ids);
 
-    @Query(value = "SELECT username FROM users LIMIT :numberOfUsernames", nativeQuery = true)
-    List<String> findAllUsernames(@Param("numberOfUsernames") int numberOfUsernames);
+    @Query(value = "SELECT username FROM users", nativeQuery = true)
+    Stream<String> streamAllUsernames();
 }

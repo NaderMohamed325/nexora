@@ -7,9 +7,10 @@ import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -19,18 +20,19 @@ public class UserLookUpServiceImpl implements UserLookUpService {
     private final UserRepository userRepository;
     final int MAX_USER_LIMIT = 500_000;
 
-    // avg name is 1 byte, so 500k users = 500k bytes = 500 KB, which is reasonable for in-memory storage
     @Scheduled(cron = "0 0 0 * * 0")
     @PostConstruct
+    @Transactional(readOnly = true)
     public void init() {
+        long userCount = Math.max(userRepository.count(), MAX_USER_LIMIT);
         bloomFilter = BloomFilter.create(
                 Funnels.stringFunnel(StandardCharsets.UTF_8),
-                MAX_USER_LIMIT,
+                userCount,
                 0.01
         );
-        List<String> existingUsernames = userRepository.findAllUsernames(MAX_USER_LIMIT);
-        existingUsernames.forEach(bloomFilter::put);
-
+        try (Stream<String> usernames = userRepository.streamAllUsernames()) {
+            usernames.forEach(bloomFilter::put);
+        }
     }
 
     @Override
