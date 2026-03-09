@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
@@ -31,7 +32,7 @@ public class Post extends AuditData {
     private User author;
 
 
-    @Column(nullable = true)
-    List<String> media_urls;
+    @Column(nullable = false)
+    List<String> media_urls = new ArrayList<>();
 
 }
