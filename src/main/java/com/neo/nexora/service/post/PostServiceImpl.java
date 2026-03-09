@@ -174,7 +174,19 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public Page<PostResponseDto> getPostsByDateRange(LocalDateTime startDate, LocalDateTime endDate, int page, int size) {
+    public Page<PostResponseDto> getPostsByDateRange(@NonNull LocalDateTime startDate, LocalDateTime endDate, int page, int size) {
+
+        if (startDate.isAfter(endDate)) {
+            log.warn("Invalid date range: startDate {} is after endDate {}", startDate, endDate);
+            throw new IllegalArgumentException("Start date must be before end date");
+        }
+
+        if (endDate == null) {
+            log.warn("End date is null, defaulting to current time");
+            endDate = LocalDateTime.now();
+        }
+
+
         return postRepository.findPostByCreatedAtBetween(startDate, endDate, PageRequest.of(page, size)).map(this::mapToResponseDto);
 
     }
