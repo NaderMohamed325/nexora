@@ -11,7 +11,7 @@ public class BloomFilterConfig {
     public BloomFilter<String> userBloomFilter() {
         return BloomFilter.create(
                 Funnels.stringFunnel(StandardCharsets.UTF_8),
-                500_000,    // Expected number of insertions
+                1_000_000,    // Expected number of insertions
                 0.01        // False positive probability (1%)
         );
     }
