@@ -55,9 +55,14 @@ public class SlugServiceImpl implements SlugService {
             log.warn("Slug '{}' not found", slug);
             return new ResourceNotFoundException("Slug '" + slug + "' not found");
         });
+        // Atomic DB-side increment; clearAutomatically evicts `found` from the
+        // persistence context so Hibernate cannot flush a stale clickCount on commit.
         slugRepository.incrementClickCount(slug);
-        found.setClickCount(found.getClickCount() + 1);
-        log.info("Resolved slug '{}', total clicks: {}", slug, found.getClickCount());
+        // Re-read the authoritative count written by the bulk UPDATE.
+        long updatedCount = slugRepository.findClickCountBySlug(slug)
+                .orElse(found.getClickCount() + 1);
+        found.setClickCount(updatedCount);
+        log.info("Resolved slug '{}', total clicks: {}", slug, updatedCount);
         return mapToResponseDto(found);
     }
 

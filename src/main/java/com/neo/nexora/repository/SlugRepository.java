@@ -26,9 +26,12 @@ public interface SlugRepository extends JpaRepository<Slug, Long> {
     Page<Slug> findAllByEntityType(EntityType entityType, Pageable pageable);
 
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Slug s SET s.clickCount = s.clickCount + 1 WHERE s.slug = :slug")
     void incrementClickCount(@Param("slug") String slug);
+
+    @Query("SELECT s.clickCount FROM Slug s WHERE s.slug = :slug")
+    Optional<Long> findClickCountBySlug(@Param("slug") String slug);
 
     @Transactional
     void deleteBySlug(String slug);
