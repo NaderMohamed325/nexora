@@ -1,5 +1,8 @@
 package com.neo.nexora.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,12 +46,14 @@ public class UserDeletionBatchDto {
      * Zero-based index of this batch within the current scheduled run.
      * <p>Used for progress logging (e.g., "Processing batch 3/10").</p>
      */
+    @PositiveOrZero(message = "Batch index must be zero or positive")
     private int batchIndex;
 
     /**
      * Total number of batches produced in the current scheduled run.
      * <p>Used alongside {@link #batchIndex} for progress logging.</p>
      */
+    @PositiveOrZero(message = "Total batches must be zero or positive")
     private int totalBatches;
 
     /**
@@ -57,5 +62,7 @@ public class UserDeletionBatchDto {
      * The consumer will further partition these into sub-batches of 500
      * before executing {@code DELETE} statements.</p>
      */
+    @NotNull(message = "User IDs list cannot be null")
+    @NotEmpty(message = "User IDs list cannot be empty")
     private List<Long> userIds;
 }

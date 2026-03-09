@@ -36,6 +36,12 @@ public interface CloudinaryUploadService {
      * @param publicId the Cloudinary public ID of the asset to remove
      */
     void delete(String publicId);
+
+
+
+     String extractPublicId(String cloudinaryUrl) ;
+
+
 }
 
 

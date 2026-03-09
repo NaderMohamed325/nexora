@@ -109,4 +109,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("DELETE FROM User u WHERE u.id IN :ids")
     void deleteBatch(@Param("ids") List<Long> ids);
 
+    @Query(value = "SELECT username FROM users LIMIT :numberOfUsernames", nativeQuery = true)
+    List<String> findAllUsernames(@Param("numberOfUsernames") int numberOfUsernames);
 }

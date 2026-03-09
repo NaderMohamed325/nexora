@@ -5,6 +5,7 @@ import com.neo.nexora.entity.Role;
 import com.neo.nexora.entity.User;
 import com.neo.nexora.repository.UserRepository;
 import com.neo.nexora.security.JwtUtil;
+import com.neo.nexora.service.user.lookUp.UserLookUpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final TokenBlacklistService tokenBlacklistService;
     private final PasswordResetService passwordResetService;
+    private final UserLookUpService userLookUpService;
 
     @Value("${jwt.expiration}")
     private Long jwtExpiration;
@@ -33,7 +35,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
+        // Use Bloom filter first for fast rejection
+        if (userLookUpService.mightContainUser(request.getUsername())
+                && userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -47,6 +51,7 @@ public class AuthServiceImpl implements AuthService {
         user.setRole(Role.USER);
 
         userRepository.save(user);
+        userLookUpService.addUser(user.getUsername());
         log.info("User registered successfully: {}", user.getUsername());
 
         String token = jwtUtil.generateToken(user);
@@ -104,7 +109,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public UserResponseDto createAdmin(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
+        // Use Bloom filter first for fast rejection
+        if (userLookUpService.mightContainUser(request.getUsername())
+                && userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -118,6 +125,7 @@ public class AuthServiceImpl implements AuthService {
         user.setRole(Role.ADMIN);
 
         userRepository.save(user);
+        userLookUpService.addUser(user.getUsername());
         log.info("Admin created successfully: {}", user.getUsername());
 
         return UserResponseDto.fromEntity(user);
