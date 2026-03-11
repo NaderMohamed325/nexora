@@ -35,4 +35,7 @@ public class Post extends AuditData {
     @Column(nullable = false)
     List<String> media_urls = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
 }
