@@ -150,34 +150,15 @@
             <artifactId>guava</artifactId>
             <version>33.5.0-jre</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.diffplug.spotless</groupId>
-                <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.43.0</version> <!-- Use a recent version -->
-                <configuration>
-                    <java>
-                        <!-- Use the Google Java style guide or other rules -->
-                        <googleJavaFormat>
-                            <version>1.17.0</version>
-                        </googleJavaFormat>
-                        <!-- Optionally, enforce a specific license header -->
-                        <!-- <licenseHeader> ... </licenseHeader> -->
-                    </java>
-                    <!-- Add configuration for other file types (XML, Markdown, etc) -->
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <phase>compile</phase> <!-- Automatically check on compilation -->
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
