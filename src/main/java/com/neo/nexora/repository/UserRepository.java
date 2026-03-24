@@ -1,6 +1,8 @@
 package com.neo.nexora.repository;
 
 import com.neo.nexora.entity.User;
+import com.neo.nexora.service.queue.user.UserDeletionConsumerImpl;
+import com.neo.nexora.service.queue.user.UserDeletionProducerImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,10 +25,10 @@ import java.util.Optional;
  * <h3>Queue-related methods</h3>
  * <ul>
  *   <li>{@link #findUsersScheduledForDeletion(LocalDateTime, Pageable)} — used by the
- *       {@link com.neo.nexora.service.queue.producer.UserDeletionProducerImpl producer}
+ *       {@link UserDeletionProducerImpl producer}
  *       to page through users eligible for deletion.</li>
  *   <li>{@link #deleteBatch(List)} — used by the
- *       {@link com.neo.nexora.service.queue.consumer.UserDeletionConsumerImpl consumer}
+ *       {@link UserDeletionConsumerImpl consumer}
  *       to bulk-delete users in sub-batches of 500.</li>
  * </ul>
  *
@@ -75,7 +77,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * {@code scheduledDeletionAt} timestamp is in the past.
      *
      * <p><b>Used by:</b>
-     * {@link com.neo.nexora.service.queue.producer.UserDeletionProducerImpl}</p>
+     * {@link UserDeletionProducerImpl}</p>
      *
      * <p>Returns a {@link Page} so the producer can iterate page-by-page
      * (page size = {@value com.neo.nexora.config.RabbitMQConfig#BATCH_SIZE})
@@ -93,7 +95,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Bulk-deletes users by a list of IDs in a single SQL {@code DELETE} statement.
      *
      * <p><b>Used by:</b>
-     * {@link com.neo.nexora.service.queue.consumer.UserDeletionConsumerImpl}</p>
+     * {@link UserDeletionConsumerImpl}</p>
      *
      * <p>Instead of issuing {@code N} individual {@code DELETE} statements (one per user),
      * this executes a single:</p>

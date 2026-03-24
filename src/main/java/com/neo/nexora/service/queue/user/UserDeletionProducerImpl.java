@@ -1,4 +1,4 @@
-package com.neo.nexora.service.queue.producer;
+package com.neo.nexora.service.queue.user;
 
 import com.neo.nexora.config.RabbitMQConfig;
 import com.neo.nexora.dto.UserDeletionBatchDto;
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
  * </pre>
  *
  * @see com.neo.nexora.config.RabbitMQConfig         RabbitMQ infrastructure (queue, exchange, binding)
- * @see com.neo.nexora.service.queue.consumer.UserDeletionConsumerImpl  Consumer that processes these batches
+ * @see UserDeletionConsumerImpl  Consumer that processes these batches
  * @see UserDeletionBatchDto                         DTO carried by each message
  */
 @Service
