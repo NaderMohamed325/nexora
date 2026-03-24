@@ -8,9 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @Entity
@@ -66,9 +64,21 @@ public class User extends AuditData implements UserDetails {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts= new ArrayList<>();
+    private List<Post> posts = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "following_id"),   // "I am following someone"
+            inverseJoinColumns = @JoinColumn(name = "follower_id") // "they follow me"
+    )
+    private Set<User> following = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "following")
+    private Set<User> followers = new HashSet<>();
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
