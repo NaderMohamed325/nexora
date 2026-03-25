@@ -2,8 +2,6 @@ package com.neo.nexora.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.neo.nexora.service.queue.user.UserDeletionConsumerImpl;
-import com.neo.nexora.service.queue.user.UserDeletionProducerImpl;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -43,11 +41,12 @@ public class RabbitMQConfig {
     public static final int BATCH_SIZE = 2000;
 
     // Add these alongside your existing constants
-    public static final String NOTIFICATION_QUEUE       = "notifications.queue";
-    public static final String NOTIFICATION_EXCHANGE    = "notifications.exchange";
+    public static final String NOTIFICATION_QUEUE = "notifications.queue";
+    public static final String NOTIFICATION_EXCHANGE = "notifications.exchange";
     public static final String NOTIFICATION_ROUTING_KEY = "notifications.#";
-    public static final String NOTIFICATION_DLX         = "notifications.dlx";
-    public static final String NOTIFICATION_DLQ         = "notifications.dlq";
+    public static final String NOTIFICATION_DLX = "notifications.dlx";
+    public static final String NOTIFICATION_DLQ = "notifications.dlq";
+
     /**
      * Declares the durable user deletion queue.
      * <p>
@@ -93,6 +92,52 @@ public class RabbitMQConfig {
                 .bind(userDeletionQueue)
                 .to(userDeletionExchange)
                 .with(ROUTING_KEY);
+    }
+
+    /**
+     * Declares the notification queue for storing notification messages.
+     * <p>
+     * <b>Durable</b> — survives RabbitMQ restarts.<br>
+     * <b>x-message-ttl = 3,600,000 ms (1 hour)</b> — messages expire after 1 hour if unconsumed.
+     *
+     * @return a durable {@link Queue} named {@value #NOTIFICATION_QUEUE}
+     */
+    @Bean
+    public Queue notificationQueue() {
+        return QueueBuilder.durable(NOTIFICATION_QUEUE)
+                .withArgument("x-message-ttl", 3600000)
+                .build();
+    }
+
+    /**
+     * Declares the Topic Exchange for notification routing.
+     * <p>
+     * A <b>Topic Exchange</b> routes messages to queues based on wildcard pattern matching.
+     * Routing key pattern: {@value #NOTIFICATION_ROUTING_KEY} matches all notification types.
+     *
+     * @return a {@link TopicExchange} named {@value #NOTIFICATION_EXCHANGE}
+     */
+    @Bean
+    public TopicExchange notificationExchange() {
+        return new TopicExchange(NOTIFICATION_EXCHANGE);
+    }
+
+    /**
+     * Binds the notification queue to the exchange using a wildcard routing key.
+     * <p>
+     * This tells RabbitMQ: <i>"Any message sent to {@value #NOTIFICATION_EXCHANGE} with routing key
+     * matching {@value #NOTIFICATION_ROUTING_KEY} should be delivered to {@value #NOTIFICATION_QUEUE}."</i>
+     *
+     * @param notificationQueue    the notification queue bean to bind
+     * @param notificationExchange the notification exchange bean to bind to
+     * @return the {@link Binding} linking exchange → queue via routing key pattern
+     */
+    @Bean
+    public Binding notificationBinding(Queue notificationQueue, TopicExchange notificationExchange) {
+        return BindingBuilder
+                .bind(notificationQueue)
+                .to(notificationExchange)
+                .with(NOTIFICATION_ROUTING_KEY);
     }
 
     /**
