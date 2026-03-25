@@ -34,9 +34,10 @@ public class CommentController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<CommentResponseDto>> addComment(
             @AuthenticationPrincipal UserDetails userDetails,
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
             @PathVariable Long postId,
             @Valid @RequestBody CommentRequestDto requestDto) {
-        CommentResponseDto comment = commentService.addComment(userDetails, postId, requestDto);
+        CommentResponseDto comment = commentService.addComment(userDetails, idempotencyKey, postId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Comment added successfully", comment));
     }
