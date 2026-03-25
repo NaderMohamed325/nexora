@@ -19,11 +19,14 @@ public class Notification extends AuditData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "recipient_id", nullable = false)
-    private Long recipientId;
 
-    @Column(name = "actor_id")
-    private Long actorId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipient_id", nullable = false, insertable = false, updatable = false)
+    private User recipient;
+
+    @ManyToOne
+    @JoinColumn(name = "actor_id", nullable = false, insertable = false, updatable = false)
+    private User actor;
 
     @Column(nullable = false)
     private String type;
