@@ -40,10 +40,11 @@ public class PostController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<PostResponseDto>> createPost(
             @AuthenticationPrincipal UserDetails userDetails,
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
             @Valid @RequestPart("post") PostRequestDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         List<MultipartFile> fileList = files != null ? files : List.of();
-        PostResponseDto created = postService.createPost(userDetails, requestDto, fileList);
+        PostResponseDto created = postService.createPost(userDetails, idempotencyKey, requestDto, fileList);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Post created successfully", created));
     }

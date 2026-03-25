@@ -10,6 +10,7 @@ import com.neo.nexora.exception.ResourceNotFoundException;
 import com.neo.nexora.repository.PostRepository;
 import com.neo.nexora.repository.UserRepository;
 import com.neo.nexora.service.cloudinary.CloudinaryUploadService;
+import com.neo.nexora.service.idempotency.IdempotencyService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -32,7 +33,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CloudinaryUploadService cloudinaryUploadService;
-
+    private final IdempotencyService idempotencyService;
 
     private @NonNull PostResponseDto mapToResponseDto(@NonNull Post post) {
         PostResponseDto dto = new PostResponseDto();
@@ -47,8 +48,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public PostResponseDto createPost(@NonNull UserDetails userDetails, @NonNull PostRequestDto requestDto, @NonNull List<MultipartFile> fileList) {
+    public PostResponseDto createPost(@NonNull UserDetails userDetails, String idempotencyKey, @NonNull PostRequestDto requestDto, @NonNull List<MultipartFile> fileList) {
         String username = userDetails.getUsername();
+        idempotencyService.validate(idempotencyKey, username);
         User author = userRepository.findByUsername(username).orElseThrow(() -> {
             log.warn("User with username {} is not found", username);
             return new ResourceNotFoundException("Usr with " + username + " is not found");

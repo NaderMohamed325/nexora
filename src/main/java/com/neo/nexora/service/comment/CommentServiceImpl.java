@@ -9,6 +9,7 @@ import com.neo.nexora.exception.ResourceNotFoundException;
 import com.neo.nexora.repository.CommentRepository;
 import com.neo.nexora.repository.PostRepository;
 import com.neo.nexora.repository.UserRepository;
+import com.neo.nexora.service.idempotency.IdempotencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final IdempotencyService idempotencyService;
 
     private CommentResponseDto mapToResponseDto(Comment comment) {
         CommentResponseDto dto = new CommentResponseDto();
@@ -44,11 +46,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentResponseDto addComment(UserDetails userDetails, Long postId, CommentRequestDto requestDto) {
+    public CommentResponseDto addComment(UserDetails userDetails, String idempotencyKey, Long postId, CommentRequestDto requestDto) {
         User author = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userDetails.getUsername()));
         Post post = postRepository.findPostById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
+
+        idempotencyService.validate(idempotencyKey, userDetails.getUsername());
 
         Comment comment = new Comment();
         comment.setContent(requestDto.getContent());

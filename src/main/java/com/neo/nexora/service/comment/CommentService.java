@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CommentService {
 
-    CommentResponseDto addComment(UserDetails userDetails, Long postId, CommentRequestDto requestDto);
+    CommentResponseDto addComment(UserDetails userDetails,String idempotencyKey, Long postId, CommentRequestDto requestDto);
 
     Page<CommentResponseDto> getCommentsByPostId(Long postId, int page, int size);
 

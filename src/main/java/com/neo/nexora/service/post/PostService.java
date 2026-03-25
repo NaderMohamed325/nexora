@@ -13,7 +13,7 @@ import java.util.List;
 public interface PostService {
 
 
-    PostResponseDto createPost(UserDetails userDetails, PostRequestDto requestDto, List<MultipartFile> fileList);
+    PostResponseDto createPost(UserDetails userDetails, String idempotencyKey, PostRequestDto requestDto, List<MultipartFile> fileList);
 
     List<PostResponseDto> getPostsByUserId(Long Id);
 
