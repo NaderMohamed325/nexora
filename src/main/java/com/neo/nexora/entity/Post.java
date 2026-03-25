@@ -15,26 +15,19 @@ import java.util.List;
 @Setter
 @Getter
 public class Post extends AuditData {
+    @Column(nullable = false)
+    List<String> media_urls = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
     @Column(nullable = false)
     private String title;
-
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
-
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
-
-
-    @Column(nullable = false)
-    List<String> media_urls = new ArrayList<>();
-
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 

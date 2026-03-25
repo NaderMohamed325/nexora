@@ -28,8 +28,8 @@ public interface PostService {
     PostResponseDto updatePost(UserDetails userDetails, Long id, PostRequestDto requestDto, PostMediaUpdateDto mediaUpdateDto, List<MultipartFile> fileList);
 
 
-     Page<PostResponseDto> getPostsByDateRange(LocalDateTime startDate, LocalDateTime endDate, int page, int size);
+    Page<PostResponseDto> getPostsByDateRange(LocalDateTime startDate, LocalDateTime endDate, int page, int size);
 
-     Page<PostResponseDto> getPostsByUserIdAndDateRange(Long userId, LocalDateTime startDate, LocalDateTime endDate, int page, int size);
+    Page<PostResponseDto> getPostsByUserIdAndDateRange(Long userId, LocalDateTime startDate, LocalDateTime endDate, int page, int size);
 
 }

@@ -87,7 +87,7 @@ public class SlugServiceImpl implements SlugService {
     @Transactional(readOnly = true)
     public Page<SlugResponseDto> getSlugsByEntityType(EntityType entityType, int page, int size) {
         return slugRepository.findAllByEntityType(entityType,
-                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "clickCount")))
+                        PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "clickCount")))
                 .map(this::mapToResponseDto);
     }
 

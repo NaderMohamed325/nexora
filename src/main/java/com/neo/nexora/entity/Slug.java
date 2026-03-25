@@ -23,6 +23,6 @@ public class Slug {
     private EntityType entityType;
 
     @Column(nullable = false)
-    private  Long clickCount = 0L;
+    private Long clickCount = 0L;
 
 }

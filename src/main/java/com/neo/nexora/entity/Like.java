@@ -7,11 +7,11 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @Entity
 @Table(
-    name = "likes",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "post_id"}),
-        @UniqueConstraint(columnNames = {"user_id", "comment_id"})
-    }
+        name = "likes",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"user_id", "post_id"}),
+                @UniqueConstraint(columnNames = {"user_id", "comment_id"})
+        }
 )
 @NoArgsConstructor
 @AllArgsConstructor

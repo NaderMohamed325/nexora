@@ -37,11 +37,15 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
     @Value("${cloudinary.max-file-size:5242880}")
     private long maxFileSize;
 
-    /** Allowed MIME types for avatar uploads — images only. */
+    /**
+     * Allowed MIME types for avatar uploads — images only.
+     */
     @Value("${cloudinary.allowed-image-types:image/jpeg,image/png,image/webp,image/gif}")
     private String allowedImageTypes;
 
-    /** Allowed MIME types for general uploads — images and videos. */
+    /**
+     * Allowed MIME types for general uploads — images and videos.
+     */
     @Value("${cloudinary.allowed-media-types:image/jpeg,image/png,image/webp,image/gif,video/mp4,video/mpeg,video/quicktime,video/webm}")
     private String allowedMediaTypes;
 

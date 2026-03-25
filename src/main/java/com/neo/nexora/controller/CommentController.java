@@ -29,7 +29,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @Operation(summary = "Add a comment to a post",
-               description = "Adds a new comment to the specified post for the authenticated user")
+            description = "Adds a new comment to the specified post for the authenticated user")
     @PostMapping("/post/{postId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<CommentResponseDto>> addComment(
@@ -42,7 +42,7 @@ public class CommentController {
     }
 
     @Operation(summary = "Get comments for a post",
-               description = "Retrieves a paginated list of comments for the specified post")
+            description = "Retrieves a paginated list of comments for the specified post")
     @GetMapping("/post/{postId}")
     public ResponseEntity<ApiResponse<Page<CommentResponseDto>>> getCommentsByPost(
             @PathVariable Long postId,
@@ -53,7 +53,7 @@ public class CommentController {
     }
 
     @Operation(summary = "Get comments by user",
-               description = "Retrieves all comments made by a specific user")
+            description = "Retrieves all comments made by a specific user")
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getCommentsByUser(
             @PathVariable Long userId) {
@@ -62,7 +62,7 @@ public class CommentController {
     }
 
     @Operation(summary = "Update a comment",
-               description = "Updates the content of a comment. Only the author or an admin can update a comment")
+            description = "Updates the content of a comment. Only the author or an admin can update a comment")
     @PutMapping("/{commentId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<CommentResponseDto>> updateComment(
@@ -74,7 +74,7 @@ public class CommentController {
     }
 
     @Operation(summary = "Delete a comment",
-               description = "Deletes a comment. Only the author or an admin can delete a comment")
+            description = "Deletes a comment. Only the author or an admin can delete a comment")
     @DeleteMapping("/{commentId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteComment(
