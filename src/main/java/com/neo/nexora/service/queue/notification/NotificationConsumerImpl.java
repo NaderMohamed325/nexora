@@ -7,13 +7,15 @@ import com.neo.nexora.repository.NotificationRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
 @Service
 @Slf4j
 @AllArgsConstructor
 public class NotificationConsumerImpl implements NotificationConsumer {
-    private  final NotificationRepository notificationRepository;
-
+    private final NotificationRepository notificationRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     @RabbitListener(queues = RabbitMQConfig.NOTIFICATION_QUEUE)
@@ -30,6 +32,13 @@ public class NotificationConsumerImpl implements NotificationConsumer {
                     .build();
 
             notificationRepository.save(entity);
+
+            // Send real-time notification via WebSocket
+            String destination = "/topic/notifications/" + message.getRecipientId();
+            messagingTemplate.convertAndSend(destination, message);
+
+            log.info("Notification sent to user {} via WebSocket at {}",
+                    message.getRecipientId(), destination);
 
         } catch (Exception e) {
             log.error("Failed to process notification for recipient={}", message.getRecipientId(), e);
