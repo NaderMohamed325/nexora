@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Table(name = "notifications", indexes = {
         @Index(name = "idx_notifications_recipient", columnList = "recipient_id"),
-        @Index(name = "idx_notifications_unread",    columnList = "recipient_id, read")
+        @Index(name = "idx_notifications_unread", columnList = "recipient_id, read")
 })
 public class Notification extends AuditData {
 
