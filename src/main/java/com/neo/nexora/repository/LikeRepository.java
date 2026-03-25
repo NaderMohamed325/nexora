@@ -27,5 +27,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
 
     @Transactional
     void deleteByUserIdAndCommentId(Long userId, Long commentId);
+
+    Long countByPost_Id(Long postId);
 }
 

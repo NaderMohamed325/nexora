@@ -12,6 +12,8 @@ import com.neo.nexora.repository.PostRepository;
 import com.neo.nexora.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +60,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "postLikeCounts", key = "#postId")
     public LikeResponseDto togglePostLike(UserDetails userDetails, Long postId) {
         User user = resolveUser(userDetails);
         Post post = postRepository.findPostById(postId)
@@ -88,6 +91,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "commentLikeCounts", key = "#commentId")
     public LikeResponseDto toggleCommentLike(UserDetails userDetails, Long commentId) {
         User user = resolveUser(userDetails);
         Comment comment = commentRepository.findById(commentId)
@@ -117,6 +121,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "postLikeCounts", key = "#postId")
     public long getPostLikeCount(Long postId) {
         if (!postRepository.existsById(postId)) {
             throw new ResourceNotFoundException("Post not found with id: " + postId);
@@ -126,6 +131,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "commentLikeCounts", key = "#commentId")
     public long getCommentLikeCount(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new ResourceNotFoundException("Comment not found with id: " + commentId);
