@@ -35,7 +35,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findPostByAuthor_IdAndCreatedAtBetween(Long authorId,
                                                       LocalDateTime createdAtAfter,
-                                                      LocalDateTime createdAtBefore,
-                                                      Pageable pageable);
-
+                                                      LocalDateTime createdAtBefore, Pageable pageable);
 }
