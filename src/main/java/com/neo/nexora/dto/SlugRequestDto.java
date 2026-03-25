@@ -15,7 +15,7 @@ public class SlugRequestDto {
 
     @NotBlank(message = "Slug must not be blank")
     @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-             message = "Slug must be lowercase alphanumeric words separated by hyphens")
+            message = "Slug must be lowercase alphanumeric words separated by hyphens")
     private String slug;
 
     @NotNull(message = "Entity type must not be null")

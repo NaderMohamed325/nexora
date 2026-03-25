@@ -1,4 +1,4 @@
-package com.neo.nexora.service.queue.consumer;
+package com.neo.nexora.service.queue.user;
 
 import com.neo.nexora.dto.UserDeletionBatchDto;
 

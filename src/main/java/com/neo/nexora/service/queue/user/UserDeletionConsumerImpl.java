@@ -1,4 +1,4 @@
-package com.neo.nexora.service.queue.consumer;
+package com.neo.nexora.service.queue.user;
 
 import com.neo.nexora.config.RabbitMQConfig;
 import com.neo.nexora.dto.UserDeletionBatchDto;
@@ -43,7 +43,7 @@ import java.util.List;
  * {@code application.yml}).</p>
  *
  * @see com.neo.nexora.config.RabbitMQConfig                             Queue / exchange / binding declarations
- * @see com.neo.nexora.service.queue.producer.UserDeletionProducerImpl   Producer that publishes these batches
+ * @see UserDeletionProducerImpl   Producer that publishes these batches
  * @see com.neo.nexora.dto.UserDeletionBatchDto                          DTO carried by each message
  */
 @Service

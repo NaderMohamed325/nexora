@@ -1,5 +1,7 @@
 package com.neo.nexora.dto;
 
+import com.neo.nexora.service.queue.user.UserDeletionConsumerImpl;
+import com.neo.nexora.service.queue.user.UserDeletionProducerImpl;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -34,8 +36,8 @@ import java.util.List;
  * </ul>
  *
  * @see com.neo.nexora.config.RabbitMQConfig                             Queue / exchange / binding declarations
- * @see com.neo.nexora.service.queue.producer.UserDeletionProducerImpl   Publishes these DTOs
- * @see com.neo.nexora.service.queue.consumer.UserDeletionConsumerImpl   Consumes and processes these DTOs
+ * @see UserDeletionProducerImpl   Publishes these DTOs
+ * @see UserDeletionConsumerImpl   Consumes and processes these DTOs
  */
 @Data
 @AllArgsConstructor

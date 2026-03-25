@@ -1,0 +1,659 @@
+{
+  "info": {
+    "name": "Nexora - All APIs",
+    "description": "Postman collection for all Nexora API controllers (Auth, Users, Posts, Comments, Likes, Slugs, Follow).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "69a9a22c-3ad3-4d6f-a7d7-8db7e532da10"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "jwtToken",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": "1"
+    },
+    {
+      "key": "email",
+      "value": "user@example.com"
+    },
+    {
+      "key": "username",
+      "value": "testuser"
+    },
+    {
+      "key": "postId",
+      "value": "1"
+    },
+    {
+      "key": "commentId",
+      "value": "1"
+    },
+    {
+      "key": "followeeId",
+      "value": "2"
+    },
+    {
+      "key": "slugValue",
+      "value": "hello-world"
+    },
+    {
+      "key": "entityType",
+      "value": "POST"
+    },
+    {
+      "key": "keyword",
+      "value": "aurora"
+    },
+    {
+      "key": "startDate",
+      "value": "2026-01-01T00:00:00"
+    },
+    {
+      "key": "endDate",
+      "value": "2026-12-31T23:59:59"
+    },
+    {
+      "key": "resetToken",
+      "value": "sample-reset-token"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwtToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"Password123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('jwtToken', json.data.token);",
+                  "}",
+                  "if (json && json.data && json.data.username) {",
+                  "  pm.collectionVariables.set('username', json.data.username);",
+                  "}",
+                  "if (json && json.data && json.data.email) {",
+                  "  pm.collectionVariables.set('email', json.data.email);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"Password123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login status is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "if (json && json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('jwtToken', json.data.token);",
+                  "}",
+                  "if (json && json.data && json.data.username) {",
+                  "  pm.collectionVariables.set('username', json.data.username);",
+                  "}",
+                  "if (json && json.data && json.data.email) {",
+                  "  pm.collectionVariables.set('email', json.data.email);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/logout"
+          }
+        },
+        {
+          "name": "Request Password Reset",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/password-reset/request",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Confirm Password Reset",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/password-reset/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"NewPassword123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/change-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Password123\",\n  \"newPassword\": \"NewPassword123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Admin (ADMIN only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/create-admin",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin2\",\n  \"email\": \"admin2@example.com\",\n  \"password\": \"Password123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Get User by Email (ADMIN only)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/email/{{email}}"
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users?page=0&size=10&sortBy=id&sortDir=asc"
+          }
+        },
+        {
+          "name": "Search Users by Username",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/search?username={{username}}"
+          }
+        },
+        {
+          "name": "Update Current User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"updated_user\",\n  \"email\": \"updated@example.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete User by ID (ADMIN only)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Deactivate Account",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/users/deactivate"
+          }
+        },
+        {
+          "name": "Reactivate Account",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/users/reactivate"
+          }
+        },
+        {
+          "name": "Upload Avatar",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/users/{{userId}}/avatar",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Create Post",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/posts",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "post",
+                  "value": "{\"title\":\"My first post\",\"content\":\"Hello Nexora\"}",
+                  "type": "text"
+                },
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Posts",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/posts?page=0&size=10"
+          }
+        },
+        {
+          "name": "Get Post by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/posts/{{postId}}"
+          }
+        },
+        {
+          "name": "Get Posts by User ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/posts/user/{{userId}}"
+          }
+        },
+        {
+          "name": "Search Posts",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/posts/search?keyword={{keyword}}&page=0&size=10"
+          }
+        },
+        {
+          "name": "Get Posts by Date Range",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/posts/date-range?startDate={{startDate}}&endDate={{endDate}}&page=0&size=10"
+          }
+        },
+        {
+          "name": "Get User Posts by Date Range",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/posts/user/{{userId}}/date-range?startDate={{startDate}}&endDate={{endDate}}&page=0&size=10"
+          }
+        },
+        {
+          "name": "Update Post",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/posts/{{postId}}",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "post",
+                  "value": "{\"title\":\"Updated title\",\"content\":\"Updated content\"}",
+                  "type": "text"
+                },
+                {
+                  "key": "mediaUpdate",
+                  "value": "{\"removeMediaUrls\": []}",
+                  "type": "text"
+                },
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Post",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/posts/{{postId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Add Comment to Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/comments/post/{{postId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Great post!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Comments by Post",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/comments/post/{{postId}}?page=0&size=10"
+          }
+        },
+        {
+          "name": "Get Comments by User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/comments/user/{{userId}}"
+          }
+        },
+        {
+          "name": "Update Comment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/comments/{{commentId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Updated comment\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Comment",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/comments/{{commentId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Likes",
+      "item": [
+        {
+          "name": "Toggle Post Like",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/likes/post/{{postId}}"
+          }
+        },
+        {
+          "name": "Get Post Like Count",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/likes/post/{{postId}}/count"
+          }
+        },
+        {
+          "name": "Has User Liked Post",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/likes/post/{{postId}}/status"
+          }
+        },
+        {
+          "name": "Toggle Comment Like",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/likes/comment/{{commentId}}"
+          }
+        },
+        {
+          "name": "Get Comment Like Count",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/likes/comment/{{commentId}}/count"
+          }
+        },
+        {
+          "name": "Has User Liked Comment",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/likes/comment/{{commentId}}/status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Slugs",
+      "item": [
+        {
+          "name": "Create Slug (ADMIN only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/slugs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"slug\": \"{{slugValue}}\",\n  \"entityType\": \"{{entityType}}\",\n  \"entityId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Resolve Slug",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/slugs/{{slugValue}}/resolve"
+          }
+        },
+        {
+          "name": "Get Slug",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/slugs/{{slugValue}}"
+          }
+        },
+        {
+          "name": "Slug Exists",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/slugs/{{slugValue}}/exists"
+          }
+        },
+        {
+          "name": "Get All Slugs (ADMIN only)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/slugs?page=0&size=20"
+          }
+        },
+        {
+          "name": "Get Slugs by Entity Type (ADMIN only)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/slugs/type/{{entityType}}?page=0&size=20"
+          }
+        },
+        {
+          "name": "Get Top Slugs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/slugs/top?limit=10"
+          }
+        },
+        {
+          "name": "Delete Slug (ADMIN only)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/slugs/{{slugValue}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Follow",
+      "item": [
+        {
+          "name": "Follow User",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/follow/{{followeeId}}"
+          }
+        },
+        {
+          "name": "Unfollow User",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/follow/{{followeeId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Docs",
+      "item": [
+        {
+          "name": "OpenAPI JSON",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/v3/api-docs"
+          }
+        },
+        {
+          "name": "Swagger UI",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/swagger-ui.html"
+          }
+        }
+      ]
+    }
+  ]
+}
+

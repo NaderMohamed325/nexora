@@ -15,9 +15,9 @@ import java.util.List;
 @AllArgsConstructor
 public class UserLookUpServiceImpl implements UserLookUpService {
 
-    private BloomFilter<String> bloomFilter;
-    private final UserRepository userRepository;
     final int MAX_USER_LIMIT = 1_000_000;
+    private final UserRepository userRepository;
+    private BloomFilter<String> bloomFilter;
 
     // avg name is 1 byte, so 500k users = 500k bytes = 500 KB, which is reasonable for in-memory storage
     @Scheduled(cron = "0 0 0 * * 0")

@@ -25,7 +25,7 @@ public class LikeController {
     // ── Posts ─────────────────────────────────────────────────────────────────
 
     @Operation(summary = "Toggle like on a post",
-               description = "Likes the post if not already liked, otherwise removes the like")
+            description = "Likes the post if not already liked, otherwise removes the like")
     @PostMapping("/post/{postId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<LikeResponseDto>> togglePostLike(
@@ -37,7 +37,7 @@ public class LikeController {
     }
 
     @Operation(summary = "Get like count for a post",
-               description = "Returns the total number of likes on the specified post")
+            description = "Returns the total number of likes on the specified post")
     @GetMapping("/post/{postId}/count")
     public ResponseEntity<ApiResponse<Long>> getPostLikeCount(@PathVariable Long postId) {
         long count = likeService.getPostLikeCount(postId);
@@ -45,7 +45,7 @@ public class LikeController {
     }
 
     @Operation(summary = "Check if current user liked a post",
-               description = "Returns true if the authenticated user has liked the specified post")
+            description = "Returns true if the authenticated user has liked the specified post")
     @GetMapping("/post/{postId}/status")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> hasUserLikedPost(
@@ -58,7 +58,7 @@ public class LikeController {
     // ── Comments ──────────────────────────────────────────────────────────────
 
     @Operation(summary = "Toggle like on a comment",
-               description = "Likes the comment if not already liked, otherwise removes the like")
+            description = "Likes the comment if not already liked, otherwise removes the like")
     @PostMapping("/comment/{commentId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<LikeResponseDto>> toggleCommentLike(
@@ -70,7 +70,7 @@ public class LikeController {
     }
 
     @Operation(summary = "Get like count for a comment",
-               description = "Returns the total number of likes on the specified comment")
+            description = "Returns the total number of likes on the specified comment")
     @GetMapping("/comment/{commentId}/count")
     public ResponseEntity<ApiResponse<Long>> getCommentLikeCount(@PathVariable Long commentId) {
         long count = likeService.getCommentLikeCount(commentId);
@@ -78,7 +78,7 @@ public class LikeController {
     }
 
     @Operation(summary = "Check if current user liked a comment",
-               description = "Returns true if the authenticated user has liked the specified comment")
+            description = "Returns true if the authenticated user has liked the specified comment")
     @GetMapping("/comment/{commentId}/status")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> hasUserLikedComment(

@@ -38,8 +38,7 @@ public interface CloudinaryUploadService {
     void delete(String publicId);
 
 
-
-     String extractPublicId(String cloudinaryUrl) ;
+    String extractPublicId(String cloudinaryUrl);
 
 
 }

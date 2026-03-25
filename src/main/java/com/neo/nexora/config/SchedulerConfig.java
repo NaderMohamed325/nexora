@@ -1,5 +1,6 @@
 package com.neo.nexora.config;
 
+import com.neo.nexora.service.queue.user.UserDeletionProducerImpl;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
@@ -20,7 +21,7 @@ import javax.sql.DataSource;
  *
  * <h2>Why this exists</h2>
  * <p>The user deletion pipeline relies on a scheduled job
- * ({@link com.neo.nexora.service.queue.producer.UserDeletionProducerImpl#scheduleUserDeletion()})
+ * ({@link UserDeletionProducerImpl#scheduleUserDeletion()})
  * that runs daily at 2:00 AM. This config class:</p>
  * <ol>
  *   <li><b>Enables scheduling</b> — {@code @EnableScheduling} activates Spring's task scheduler
@@ -37,7 +38,7 @@ import javax.sql.DataSource;
  * ensure that if the application is shut down while a scheduled task is running, it waits
  * up to 30 seconds for the task to finish before forcefully terminating.</p>
  *
- * @see com.neo.nexora.service.queue.producer.UserDeletionProducerImpl  The scheduled job this config enables
+ * @see UserDeletionProducerImpl  The scheduled job this config enables
  * @see com.neo.nexora.config.RabbitMQConfig                            Queue infrastructure the job publishes to
  */
 @Configuration

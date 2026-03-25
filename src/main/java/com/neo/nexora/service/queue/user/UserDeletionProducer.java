@@ -1,4 +1,4 @@
-package com.neo.nexora.service.queue.producer;
+package com.neo.nexora.service.queue.user;
 
 /**
  * Contract for the user deletion message producer.
