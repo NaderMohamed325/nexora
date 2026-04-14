@@ -26,7 +26,6 @@ func UploadRouter() chi.Router {
 	r.Post("/path", uploadFromPathHandler)
 	r.Post("/stream", streamHandler)
 	// Keep backward compatibility for existing clients using the typo path.
-	r.Post("/steam", streamHandler)
 	r.Post("/tus", uploadVideoTus)
 	return r
 }
