@@ -1,0 +1,83 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: media-db
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  createbucket:
+    image: minio/mc:latest
+    container_name: createbucket
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      sh -c "
+        until mc alias set local http://minio:9000 minioadmin minioadmin; do
+          echo 'Waiting for MinIO...' && sleep 2;
+        done &&
+        mc mb --ignore-existing local/media-bucket &&
+        echo 'Bucket created successfully'
+      "
+
+  tusd:
+    image: tusproject/tusd:latest
+    container_name: tusd
+    ports:
+      - "1080:1080"
+    environment:
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin
+      - AWS_REGION=us-east-1
+    command: [
+      "-port=1080",
+      "-s3-bucket=media-bucket",
+      "-s3-endpoint=http://minio:9000",
+      "-s3-disable-ssl",
+      "-max-size=1073741824",
+      "-base-path=/files/",
+      "-acquire-lock-timeout=30s",
+      "-network-timeout=2m",
+      "-request-completion-timeout=30s",
+      "-shutdown-timeout=30s",
+      "-log-format=json",
+      "-verbose=true",
+      "-show-startup-logs=true"
+    ]
+    depends_on:
+      minio:
+        condition: service_healthy
+      createbucket:
+        condition: service_completed_successfully
+
+volumes:
+  minio_data:
+  tusd_data:
