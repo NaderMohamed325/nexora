@@ -1,48 +1,29 @@
 package com.neo.nexora.config;
 
-import com.cloudinary.Cloudinary;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Map;
+import org.springframework.web.client.RestTemplate;
 
 /**
- * Configures the Cloudinary SDK bean using credentials supplied via environment variables.
+ * Configures the Media Server integration for file uploads.
  *
  * <p>Expected environment variables (loaded through application.yaml):
  *
  * <ul>
- *   <li>{@code CLOUDINARY_CLOUD_NAME}
- *   <li>{@code CLOUDINARY_API_KEY}
- *   <li>{@code CLOUDINARY_API_SECRET}
+ *   <li>{@code media-server.url} - Base URL of the Media Server API
  * </ul>
  */
 @Configuration
 public class CloudinaryConfig {
 
-    @Value("${cloudinary.cloud-name}")
-    private String cloudName;
-
-    @Value("${cloudinary.api-key}")
-    private String apiKey;
-
-    @Value("${cloudinary.api-secret}")
-    private String apiSecret;
-
     /**
-     * Creates and exposes a fully configured {@link Cloudinary} instance as a Spring bean.
+     * Creates and exposes a RestTemplate bean for HTTP calls to Media Server.
      *
-     * @return the Cloudinary client
+     * @return the RestTemplate client
      */
     @Bean
-    public Cloudinary cloudinary() {
-        return new Cloudinary(
-                Map.of(
-                        "cloud_name", cloudName,
-                        "api_key", apiKey,
-                        "api_secret", apiSecret,
-                        "secure", true));
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
 
