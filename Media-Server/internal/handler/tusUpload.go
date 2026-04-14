@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sync"
 
 	"go.uber.org/zap"
 )
@@ -19,37 +20,36 @@ type TusUploadRequest struct {
 
 var cl *tusgo.Client
 var uploadLocation tusgo.Upload
+var tusInitOnce sync.Once
 
-func tusInit() {
-	baseURL, _ := url.Parse(configEnv.Cfg.TusUploadUrl)
-	utils.Log.Info("TUS upload initialized")
-	uploadLocation = tusgo.Upload{Location: configEnv.Cfg.TusUploadUrl, RemoteSize: 1024 * 1024}
-
-	cl = tusgo.NewClient(http.DefaultClient, baseURL)
+func initTusClient() {
+	tusInitOnce.Do(func() {
+		baseURL, err := url.Parse(configEnv.Cfg.TusUploadUrl)
+		if err != nil {
+			utils.Log.Fatal("Invalid TUS URL", zap.Error(err))
+		}
+		uploadLocation = tusgo.Upload{Location: configEnv.Cfg.TusUploadUrl, RemoteSize: 1024 * 1024}
+		cl = tusgo.NewClient(http.DefaultClient, baseURL)
+		utils.Log.Info("TUS upload initialized", zap.String("endpoint", configEnv.Cfg.TusUploadUrl))
+	})
 }
 
 func getFilePath(r *http.Request) string {
-	buff := make([]byte, 512)
-	read, err := r.Body.Read(buff)
-	if err != nil {
-		return ""
-	}
 	reqBody := TusUploadRequest{}
-	err = json.Unmarshal(buff[:read], &reqBody)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		return ""
 	}
 	return reqBody.FilePath
 }
 
 func uploadVideoTus(w http.ResponseWriter, r *http.Request) {
+	initTusClient()
 	filePath := getFilePath(r)
 	if filePath == "" {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 	utils.Log.Info("Received TUS upload request", zap.String("filePath", filePath))
-	os.Open(filePath)
 	f, err := os.Open(filePath)
 	if err != nil {
 		utils.Log.Error("Failed to open file", zap.String("filePath", filePath), zap.Error(err))

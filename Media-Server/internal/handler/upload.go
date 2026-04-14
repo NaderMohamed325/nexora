@@ -24,15 +24,26 @@ func UploadRouter() chi.Router {
 	r := chi.NewRouter()
 	r.Post("/", uploadHandler)
 	r.Post("/path", uploadFromPathHandler)
-	r.Post("/steam", func(w http.ResponseWriter, r *http.Request) {
-		if err := streamFromMinIO(r); err != nil {
-			utils.Log.Error("Failed to stream from MinIO", zap.Error(err))
-			http.Error(w, "Failed to stream from MinIO", http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-	})
+	r.Post("/stream", streamHandler)
+	// Keep backward compatibility for existing clients using the typo path.
+	r.Post("/steam", streamHandler)
+	r.Post("/tus", uploadVideoTus)
 	return r
+}
+
+func streamHandler(w http.ResponseWriter, r *http.Request) {
+	playlistPath, err := streamFromMinIO(r)
+	if err != nil {
+		utils.Log.Error("Failed to stream from MinIO", zap.Error(err))
+		http.Error(w, "Failed to stream from MinIO", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]string{
+		"message":      "Stream generated successfully",
+		"playlistPath": playlistPath,
+	})
 }
 
 /*
@@ -132,48 +143,54 @@ type FileUrlRequest struct {
 	FileUrl string `json:"fileUrl"`
 }
 
-func streamFromMinIO(r *http.Request) error {
+func streamFromMinIO(r *http.Request) (string, error) {
 	fileUrlRequestBody := FileUrlRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&fileUrlRequestBody); err != nil {
 		utils.Log.Error("Failed to decode request body", zap.Error(err))
-		return err
+		return "", err
+	}
+
+	objectKey := fileUrlRequestBody.FileUrl
+	if strings.Contains(objectKey, "/") {
+		parts := strings.Split(objectKey, "/")
+		objectKey = parts[len(parts)-1]
 	}
 
 	client := storageMinio.GetClient()
-	object, err := client.GetObject(context.Background(), configEnv.Cfg.MinIOBucket, fileUrlRequestBody.FileUrl, minioSDK.GetObjectOptions{})
+	object, err := client.GetObject(context.Background(), configEnv.Cfg.MinIOBucket, objectKey, minioSDK.GetObjectOptions{})
 	if err != nil {
-		utils.Log.Error("Failed to get object from MinIO", zap.String("fileUrl", fileUrlRequestBody.FileUrl), zap.Error(err))
-		return err
+		utils.Log.Error("Failed to get object from MinIO", zap.String("fileUrl", objectKey), zap.Error(err))
+		return "", err
 	}
 	defer object.Close()
 
 	// fix 1: use TempFile so dir always exists
 	tmpFile, err := os.CreateTemp("", "video-*.mp4")
 	if err != nil {
-		return fmt.Errorf("create temp file: %w", err)
+		return "", fmt.Errorf("create temp file: %w", err)
 	}
 	tmpPath := tmpFile.Name()
 	defer os.Remove(tmpPath)
 
 	if _, err = io.Copy(tmpFile, object); err != nil {
 		tmpFile.Close()
-		return fmt.Errorf("download from minio: %w", err)
+		return "", fmt.Errorf("download from minio: %w", err)
 	}
 	tmpFile.Close()
 
 	// fix 2: dedicated output dir per video
-	cacheKey := strings.ReplaceAll(fileUrlRequestBody.FileUrl, "/", "_")
+	cacheKey := strings.ReplaceAll(objectKey, "/", "_")
 	outDir := filepath.Join("/tmp/hls", cacheKey)
 	if err := os.MkdirAll(outDir, 0755); err != nil {
-		return fmt.Errorf("mkdir: %w", err)
+		return "", fmt.Errorf("mkdir: %w", err)
 	}
 
 	// fix 3: capture ffmpeg error
 	if err := videoToHLS(tmpPath, outDir); err != nil {
-		return fmt.Errorf("ffmpeg: %w", err)
+		return "", fmt.Errorf("ffmpeg: %w", err)
 	}
 
-	return nil
+	return filepath.Join(outDir, "master.m3u8"), nil
 }
 
 func videoToHLS(inputPath, outDir string) error {
