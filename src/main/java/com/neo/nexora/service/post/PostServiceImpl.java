@@ -61,6 +61,9 @@ public class PostServiceImpl implements PostService {
         post.setTitle(requestDto.getTitle());
 
         List<String> urls = new ArrayList<>();
+        if (requestDto.getMediaUrls() != null && !requestDto.getMediaUrls().isEmpty()) {
+            urls.addAll(requestDto.getMediaUrls());
+        }
         if (!fileList.isEmpty()) {
             for (MultipartFile file : fileList) {
                 CloudinaryUploadResponse cloudinaryUploadResponse = cloudinaryUploadService.upload(file, "Posts");
@@ -169,6 +172,10 @@ public class PostServiceImpl implements PostService {
                 newUrls.add(response.getSecureUrl());
             }
             post.getMedia_urls().addAll(newUrls);
+        }
+
+        if (requestDto.getMediaUrls() != null && !requestDto.getMediaUrls().isEmpty()) {
+            post.getMedia_urls().addAll(requestDto.getMediaUrls());
         }
 
         return mapToResponseDto(post);
