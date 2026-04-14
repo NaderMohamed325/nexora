@@ -1,6 +1,10 @@
 package com.neo.nexora.service.cloudinary;
 
 import com.neo.nexora.dto.CloudinaryUploadResponse;
+import com.neo.nexora.dto.MediaServerPathUploadRequest;
+import com.neo.nexora.dto.MediaServerStreamRequest;
+import com.neo.nexora.dto.MediaServerStreamResponse;
+import com.neo.nexora.dto.MediaServerTusUploadResponse;
 import com.neo.nexora.dto.MediaServerUploadResponse;
 import com.neo.nexora.entity.User;
 import com.neo.nexora.exception.CloudinaryUploadException;
@@ -43,6 +47,12 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
 
     @Value("${media-server.max-file-size:5242880}")
     private long maxFileSize;
+
+    @Value("${media-server.tus-endpoint:/api/v1/upload/tus}")
+    private String tusEndpoint;
+
+    @Value("${media-server.stream-endpoint:/api/v1/upload/stream}")
+    private String streamEndpoint;
 
     /**
      * Allowed MIME types for avatar uploads — images only.
@@ -113,6 +123,56 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
         } catch (RestClientException e) {
             log.error("Avatar upload failed for userId={}", userId, e);
             throw new CloudinaryUploadException("Failed to upload avatar to Media Server", e);
+        }
+    }
+
+    @Override
+    public MediaServerTusUploadResponse uploadVideoViaTus(String filePath) {
+        if (filePath == null || filePath.isBlank()) {
+            throw new CloudinaryUploadException("Video file path must not be null or blank");
+        }
+
+        try {
+            String tusUrl = mediaServerUrl + tusEndpoint;
+            MediaServerTusUploadResponse response = restTemplate.postForObject(
+                    tusUrl,
+                    new MediaServerPathUploadRequest(filePath),
+                    MediaServerTusUploadResponse.class
+            );
+
+            if (response == null || response.getUploadUrl() == null || response.getUploadUrl().isBlank()) {
+                throw new CloudinaryUploadException("Invalid TUS response from Media Server");
+            }
+
+            return response;
+        } catch (RestClientException e) {
+            log.error("Media Server TUS upload failed for filePath={}", filePath, e);
+            throw new CloudinaryUploadException("Failed to upload video via TUS", e);
+        }
+    }
+
+    @Override
+    public MediaServerStreamResponse generateVideoStream(String fileUrl) {
+        if (fileUrl == null || fileUrl.isBlank()) {
+            throw new CloudinaryUploadException("Video file URL must not be null or blank");
+        }
+
+        try {
+            String streamUrl = mediaServerUrl + streamEndpoint;
+            MediaServerStreamResponse response = restTemplate.postForObject(
+                    streamUrl,
+                    new MediaServerStreamRequest(extractPublicId(fileUrl)),
+                    MediaServerStreamResponse.class
+            );
+
+            if (response == null) {
+                throw new CloudinaryUploadException("Invalid stream response from Media Server");
+            }
+
+            return response;
+        } catch (RestClientException e) {
+            log.error("Media Server stream generation failed for fileUrl={}", fileUrl, e);
+            throw new CloudinaryUploadException("Failed to generate video stream", e);
         }
     }
 
