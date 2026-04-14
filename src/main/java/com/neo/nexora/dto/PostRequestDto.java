@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,4 +17,6 @@ public class PostRequestDto {
     private String title;
     @Size(min = 3, max = 255)
     private String content;
+
+    private List<String> mediaUrls;
 }
